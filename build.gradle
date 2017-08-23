@@ -1,0 +1,65 @@
+
+
+buildscript {
+    ext.versions = [
+            'minSdk'    : 9,
+            'compileSdk': 26,
+            'buildTools': '26.0.1',
+            'release'   : '${VERSION_NAME}',
+            'androidPlugin': '3.0.0-beta2',
+            'androidTools': '26.0.0-beta2',
+            'supportLibrary': '26.0.1'
+    ]
+
+    ext.deps = [
+            android: [
+                    'runtime': 'com.google.android:android:4.1.1.4',
+                    'gradlePlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
+            ],
+            'support': [
+                    'compat': "com.android.support:support-compat:${versions.supportLibrary}",
+                    'annotations': "com.android.support:support-annotations:${versions.supportLibrary}",
+                    'test': [
+                            'runner': 'com.android.support.test:runner:1.0.0',
+                            'rules': 'com.android.support.test:rules:0.4.1'
+                    ],
+            ],
+            javapoet: 'com.squareup:javapoet:1.9.0',
+            junit: 'junit:junit:4.12',
+            'auto': [
+                    'service': 'com.google.auto.service:auto-service:1.0-rc3',
+                    'common': 'com.google.auto:auto-common:0.8',
+            ]
+    ]
+
+    repositories {
+        mavenCentral()
+        google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath deps.android.gradlePlugin
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+
+subprojects { project ->
+    group = GROUP
+    version = VERSION_NAME
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
