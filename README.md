@@ -1,5 +1,6 @@
 # Remoter
 
+Remoter  - An alternative to Android AIDL for Android Remote IPC services using plain java interfaces
 
 Remoter makes developing android **remote services** intuitive **without messing with AIDL**.
 
