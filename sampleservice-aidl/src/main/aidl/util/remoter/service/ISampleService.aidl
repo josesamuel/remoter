@@ -22,4 +22,8 @@ interface ISampleService {
     FooParcelable testParcelable(in FooParcelable inParcelable, out FooParcelable parcelableOut, inout FooParcelable parcelableInOut);
     FooParcelable[] testParcelableArray(in FooParcelable[] arrayIn, out FooParcelable[] arrayOut, inout FooParcelable[] arrayInOut);
     void testEcho(String string, ISampleServiceListener listener);
+
+    int testOneway0(int a);
+    oneway void testOneway1(int a);
+
 }

@@ -18,6 +18,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
  *
  * @see Remoter
  * @see ParamOut
+ * @see Oneway
  */
 @Retention(CLASS)
 @Target(PARAMETER)

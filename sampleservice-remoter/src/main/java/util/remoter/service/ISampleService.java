@@ -3,6 +3,7 @@ package util.remoter.service;
 import java.util.List;
 import java.util.Map;
 
+import remoter.annotations.Oneway;
 import remoter.annotations.ParamIn;
 import remoter.annotations.ParamOut;
 import remoter.annotations.Remoter;
@@ -41,4 +42,10 @@ public interface ISampleService {
     FooParcelable[] testParcelableArray(@ParamIn FooParcelable[] arrayIn, @ParamOut FooParcelable[] arrayOut, FooParcelable[] arrayInOut);
 
     void testEcho(String string, ISampleServiceListener listener);
+
+    //one way should get ignored
+    @Oneway int testOneway0(int a);
+
+    @Oneway void testOneway1(int a);
+
 }

@@ -66,6 +66,7 @@ That's it!
 * **@Remoter** Annotate on an interface to make it a remote interface
 * **@ParamIn** Mark an array or Parcelable parameter as an **input only** parameter(**in** of aidl). By **default** they are **input and output** (inout of aidl)
 * **@ParamOut** Mark an array or Parcelable parameter as an **output only** parameter(**out** of aidl).
+* **@Oneway** Annotate on a method (in the @Remoter interface) with void return to make it an asynchronous method. 
 
 
 
@@ -76,8 +77,8 @@ Gradle dependency
 
 ```groovy
 dependencies {
-    api 'com.josesamuel:remoter-annotations:1.0.0'
-    annotationProcessor 'com.josesamuel:remoter:1.0.0'
+    api 'com.josesamuel:remoter-annotations:1.0.1'
+    annotationProcessor 'com.josesamuel:remoter:1.0.1'
 }
 ```
 

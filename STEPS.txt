@@ -1,0 +1,9 @@
+
+Build
+1) Update version in cradle.properties
+2) ./gradlew clean uploadArchives
+
+Javadoc
+javadoc -public -sourcepath ./serviceconnector/src/main/java/ -d javadoc -windowtitle "ServiceConnector API" util.service util.service.annotation 
+
+or download from nexus and publish

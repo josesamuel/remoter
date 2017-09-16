@@ -16,7 +16,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 
+import remoter.annotations.Oneway;
 import remoter.annotations.ParamIn;
 import remoter.annotations.ParamOut;
 
@@ -30,7 +32,9 @@ class MethodBuilder extends RemoteBuilder {
         super(messager, element);
     }
 
-
+    /**
+     * Build the proxy methods
+     */
     public void addProxyMethods(TypeSpec.Builder classBuilder) {
 
         int methodIndex = 0;
@@ -38,6 +42,13 @@ class MethodBuilder extends RemoteBuilder {
             if (member.getKind() == ElementKind.METHOD) {
                 ExecutableElement executableElement = (ExecutableElement) member;
                 String methodName = executableElement.getSimpleName().toString();
+                boolean isOnewayAnnotated = member.getAnnotation(Oneway.class) != null;
+                boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
+                        && isOnewayAnnotated;
+
+                if (!isOneWay && isOnewayAnnotated) {
+                    logWarning("@Oneway is expected only for methods with void return. Ignoring it for " + member.getSimpleName());
+                }
 
 
                 MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
@@ -57,8 +68,11 @@ class MethodBuilder extends RemoteBuilder {
 
                 //add statements
                 methodBuilder
-                        .addStatement("android.os.Parcel data = android.os.Parcel.obtain()")
-                        .addStatement("android.os.Parcel reply = android.os.Parcel.obtain()");
+                        .addStatement("android.os.Parcel data = android.os.Parcel.obtain()");
+
+                if (!isOneWay) {
+                    methodBuilder.addStatement("android.os.Parcel reply = android.os.Parcel.obtain()");
+                }
 
                 //add return if any
                 if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
@@ -90,10 +104,14 @@ class MethodBuilder extends RemoteBuilder {
                 }
 
                 //send remote command
-                methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
+                if (isOneWay) {
+                    methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, null, android.os.IBinder.FLAG_ONEWAY)");
+                } else {
+                    methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
+                    //read exception if any
+                    methodBuilder.addStatement("reply.readException()");
+                }
 
-                //read exception if any
-                methodBuilder.addStatement("reply.readException()");
 
                 //read result
                 if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
@@ -127,7 +145,9 @@ class MethodBuilder extends RemoteBuilder {
 
                 //finally block
                 methodBuilder.beginControlFlow("finally");
-                methodBuilder.addStatement("reply.recycle()");
+                if (!isOneWay) {
+                    methodBuilder.addStatement("reply.recycle()");
+                }
                 methodBuilder.addStatement("data.recycle()");
                 methodBuilder.endControlFlow();
                 if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
@@ -140,6 +160,9 @@ class MethodBuilder extends RemoteBuilder {
         }
     }
 
+    /**
+     * Build the stub methods
+     */
     public void addStubMethods(TypeSpec.Builder classBuilder) {
 
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("onTransact")
@@ -165,6 +188,9 @@ class MethodBuilder extends RemoteBuilder {
             if (member.getKind() == ElementKind.METHOD) {
                 ExecutableElement executableElement = (ExecutableElement) member;
                 String methodName = executableElement.getSimpleName().toString();
+                boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
+                        && member.getAnnotation(Oneway.class) != null;
+
 
                 methodBuilder.beginControlFlow("case TRANSACTION_" + methodName + "_" + methodIndex + ":");
 
@@ -209,7 +235,10 @@ class MethodBuilder extends RemoteBuilder {
                 } else {
                     methodBuilder.addStatement(methodCall);
                 }
-                methodBuilder.addStatement("reply.writeNoException()");
+
+                if (!isOneWay) {
+                    methodBuilder.addStatement("reply.writeNoException()");
+                }
 
                 if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
                     ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());

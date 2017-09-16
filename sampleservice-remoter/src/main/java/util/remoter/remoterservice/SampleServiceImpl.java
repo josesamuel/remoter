@@ -158,4 +158,14 @@ public class SampleServiceImpl implements ISampleService {
     public void testEcho(String string, ISampleServiceListener listener) {
         listener.onEcho(string);
     }
+
+    @Override
+    public int testOneway0(int a) {
+        return 0;
+    }
+
+    @Override
+    public void testOneway1(int a) {
+
+    }
 }

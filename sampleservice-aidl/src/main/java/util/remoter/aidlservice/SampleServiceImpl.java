@@ -164,4 +164,13 @@ public class SampleServiceImpl extends ISampleService.Stub {
         listener.onEcho(string);
     }
 
+    @Override
+    public int testOneway0(int a) throws RemoteException {
+        return 0;
+    }
+
+    @Override
+    public void testOneway1(int a) throws RemoteException {
+    }
+
 }
