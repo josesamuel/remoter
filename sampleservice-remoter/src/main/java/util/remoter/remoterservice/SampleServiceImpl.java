@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import util.remoter.service.CustomData;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
@@ -168,4 +169,25 @@ public class SampleServiceImpl implements ISampleService {
     public void testOneway1(int a) {
 
     }
+
+    @Override
+    public CustomData testParcel(CustomData customData, CustomData customData2, CustomData customData3) {
+        return null;
+    }
+
+    @Override
+    public CustomData[] testParcelArray(CustomData[] customData, CustomData[] customData2, CustomData[] customData3) {
+        return new CustomData[0];
+    }
+
+    @Override
+    public List<CustomData> testParcelList(List<CustomData> customData3) {
+        return null;
+    }
+
+    @Override
+    public List<? extends CustomData> testParcelList2(List<? extends CustomData> customData3) {
+        return null;
+    }
+
 }

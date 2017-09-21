@@ -33,6 +33,7 @@ public final class BindingManager {
     private TypeMirror listTypeMirror;
     private TypeMirror mapTypeMirror;
     private TypeMirror parcellableTypeMirror;
+    private Class parcelClass;
 
     /**
      * Initialize with the given details from the annotation processing enviornment
@@ -49,6 +50,10 @@ public final class BindingManager {
         mapTypeMirror = getType("java.util.Map");
         charSequenceTypeMirror = getType("java.lang.CharSequence");
         parcellableTypeMirror = getType("android.os.Parcelable");
+        try {
+            parcelClass = Class.forName("org.parceler.Parcel");
+        } catch (ClassNotFoundException ignored) {
+        }
     }
 
     /**
@@ -168,8 +173,12 @@ public final class BindingManager {
                         paramBuilder = new ParcellableParamBuilder(messager, null);
                     } else {
                         TypeElement typeElement = elementUtils.getTypeElement(typeMirror.toString());
-                        if (typeElement != null && typeElement.getKind() == ElementKind.INTERFACE && typeElement.getAnnotation(Remoter.class) != null) {
-                            paramBuilder = new BinderParamBuilder(messager, null);
+                        if (typeElement != null) {
+                            if (typeElement.getKind() == ElementKind.INTERFACE && typeElement.getAnnotation(Remoter.class) != null) {
+                                paramBuilder = new BinderParamBuilder(messager, null);
+                            } else if (parcelClass != null && typeElement.getAnnotation(parcelClass) != null) {
+                                paramBuilder = new ParcelerParamBuilder(messager, null);
+                            }
                         }
                     }
                     break;

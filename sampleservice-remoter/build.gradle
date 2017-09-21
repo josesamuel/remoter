@@ -26,6 +26,9 @@ dependencies {
     androidTestImplementation deps.junit
     androidTestImplementation deps.support.test.rules
 
+    api 'org.parceler:parceler-api:1.1.9'
+    annotationProcessor 'org.parceler:parceler:1.1.9'
+
 //After release
 //    api 'com.josesamuel:remoter-annotations:1.0.1'
 //    annotationProcessor 'com.josesamuel:remoter:1.0.1'

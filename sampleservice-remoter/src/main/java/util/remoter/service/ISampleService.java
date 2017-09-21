@@ -44,8 +44,18 @@ public interface ISampleService {
     void testEcho(String string, ISampleServiceListener listener);
 
     //one way should get ignored
-    @Oneway int testOneway0(int a);
+    @Oneway
+    int testOneway0(int a);
 
-    @Oneway void testOneway1(int a);
+    @Oneway
+    void testOneway1(int a);
+
+    CustomData testParcel(@ParamIn CustomData customData, @ParamOut CustomData customData2, CustomData customData3);
+
+    CustomData[] testParcelArray(@ParamIn CustomData[] customData, @ParamOut CustomData[] customData2, CustomData[] customData3);
+
+    List<CustomData> testParcelList(List<CustomData> customData3);
+
+    List<? extends CustomData> testParcelList2(List<? extends CustomData> customData3);
 
 }
