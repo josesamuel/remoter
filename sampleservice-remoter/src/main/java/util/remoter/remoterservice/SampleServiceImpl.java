@@ -172,22 +172,40 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public CustomData testParcel(CustomData customData, CustomData customData2, CustomData customData3) {
-        return null;
+        return customData3;
     }
 
     @Override
     public CustomData[] testParcelArray(CustomData[] customData, CustomData[] customData2, CustomData[] customData3) {
-        return new CustomData[0];
+
+        customData2[0] = customData3[0];
+        customData2[1] = customData3[1];
+
+        customData3[0] = customData[0];
+        customData3[1] = customData[1];
+
+        return customData;
     }
 
     @Override
-    public List<CustomData> testParcelList(List<CustomData> customData3) {
-        return null;
+    public List<CustomData> testParcelList(List<CustomData> customData1, List<CustomData> customData2, List<CustomData> customData3) {
+        customData2.clear();
+        customData2.addAll(customData3);
+
+        customData3.clear();
+        customData3.addAll(customData1);
+
+        return customData1;
     }
 
     @Override
-    public List<? extends CustomData> testParcelList2(List<? extends CustomData> customData3) {
-        return null;
-    }
+    public List<? extends CustomData> testParcelList2(List<? extends CustomData> customData1, List<? extends CustomData> customData2, List<? extends CustomData> customData3) {
+        customData2.clear();
+        ((List<CustomData>) customData2).addAll(customData3);
 
+        customData3.clear();
+        ((List<CustomData>) customData3).addAll(customData1);
+
+        return customData1;
+    }
 }

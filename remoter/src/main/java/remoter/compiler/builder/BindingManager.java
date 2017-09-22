@@ -2,6 +2,7 @@ package remoter.compiler.builder;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.Filer;
@@ -10,8 +11,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
@@ -161,7 +165,10 @@ public final class BindingManager {
                     paramBuilder = getBuilderForParam(((ArrayType) typeMirror).getComponentType());
                     break;
                 case DECLARED:
-                    if (typeUtils.isAssignable(typeMirror, stringTypeMirror)) {
+                    TypeElement genericList = getGenericType(typeMirror);
+                    if (genericList != null) {
+                        paramBuilder = new ListOfParcelerParamBuilder(messager, null, genericList);
+                    } else if (typeUtils.isAssignable(typeMirror, stringTypeMirror)) {
                         paramBuilder = new StringParamBuilder(messager, null);
                     } else if (typeUtils.isAssignable(typeMirror, charSequenceTypeMirror)) {
                         paramBuilder = new CharSequenceParamBuilder(messager, null);
@@ -193,6 +200,45 @@ public final class BindingManager {
             }
         }
         return paramBuilder;
+    }
+
+    /**
+     * Return the generic type if any
+     */
+    public TypeElement getGenericType(TypeMirror typeMirror) {
+        return typeMirror.accept(new SimpleTypeVisitor6<TypeElement, Void>() {
+            @Override
+            public TypeElement visitDeclared(DeclaredType declaredType, Void v) {
+                TypeElement genericTypeElement = null;
+                TypeElement typeElement = (TypeElement) declaredType.asElement();
+                if (parcelClass != null && typeUtils.isAssignable(typeElement.asType(), listTypeMirror)) {
+                    List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+                    if (!typeArguments.isEmpty()) {
+                        for (TypeMirror genericType : typeArguments) {
+                            if (genericType instanceof WildcardType) {
+                                WildcardType wildcardType = (WildcardType) genericType;
+                                TypeMirror extendsType = wildcardType.getExtendsBound();
+                                if (extendsType != null) {
+                                    typeElement = elementUtils.getTypeElement(extendsType.toString());
+                                    if (typeElement.getAnnotation(parcelClass) != null) {
+                                        genericTypeElement = typeElement;
+                                        break;
+                                    }
+
+                                }
+                            } else {
+                                typeElement = elementUtils.getTypeElement(genericType.toString());
+                                if (typeElement.getAnnotation(parcelClass) != null) {
+                                    genericTypeElement = typeElement;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return genericTypeElement;
+            }
+        }, null);
     }
 
 

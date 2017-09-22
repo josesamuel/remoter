@@ -14,15 +14,19 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import util.remoter.remoterservice.TestActivity;
+import util.remoter.service.CustomData;
+import util.remoter.service.CustomData2;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
 import util.remoter.service.ISampleService_Proxy;
+import util.remoter.service.TestEnum;
 
 import static util.remoter.remoterservice.ServiceIntents.INTENT_AIDL_SERVICE;
 import static util.remoter.remoterservice.ServiceIntents.INTENT_REMOTER_SERVICE;
@@ -348,10 +352,10 @@ public class RemoterClientToRemoterServerTest {
 
 
     @Test
-    public void testBinder() throws RemoteException{
+    public void testBinder() throws RemoteException {
         final String message = "Hello";
         final List callBack = new ArrayList();
-        ISampleServiceListener listener = new ISampleServiceListener(){
+        ISampleServiceListener listener = new ISampleServiceListener() {
             @Override
             public void onEcho(String echo) {
                 Log.i(TAG, "Callback " + echo);
@@ -365,6 +369,161 @@ public class RemoterClientToRemoterServerTest {
     }
 
 
+    @Test
+    public void testParceler() throws RemoteException {
+        CustomData data1 = new CustomData();
+        data1.setIntData(1);
+        data1.setEnumData(TestEnum.TWO);
+        CustomData2 customData2 = new CustomData2();
+        customData2.setIntData(10);
+        customData2.setEnumData(TestEnum.TWO);
+        data1.setCustomData2(customData2);
+        data1.setCustomData2Array(new CustomData2[]{customData2});
+
+
+        CustomData data2 = new CustomData();
+        data2.setIntData(2);
+        data2.setEnumData(TestEnum.ONE);
+        CustomData2 customData22 = new CustomData2();
+        customData22.setIntData(20);
+        customData22.setEnumData(TestEnum.ONE);
+        data2.setCustomData2(customData22);
+        data2.setCustomData2Array(new CustomData2[]{customData22});
+
+        CustomData data3 = new CustomData();
+        data3.setIntData(3);
+        data3.setEnumData(TestEnum.THREE);
+        CustomData2 customData23 = new CustomData2();
+        customData23.setIntData(30);
+        customData23.setEnumData(TestEnum.THREE);
+        data3.setCustomData2(customData23);
+        data3.setCustomData2Array(new CustomData2[]{customData23});
+
+
+        CustomData result = sampleService.testParcel(data1, data2, data3);
+
+        Assert.assertEquals(3, result.getIntData());
+        Assert.assertEquals(TestEnum.THREE, result.getEnumData());
+
+        Assert.assertEquals(30, result.getCustomData2().getIntData());
+        Assert.assertEquals(TestEnum.THREE, result.getCustomData2Array()[0].getEnumData());
+    }
+
+    @Test
+    public void testParcelerArray() throws RemoteException {
+        CustomData data1 = new CustomData();
+        data1.setIntData(1);
+        data1.setEnumData(TestEnum.TWO);
+        CustomData2 customData2 = new CustomData2();
+        customData2.setIntData(10);
+        customData2.setEnumData(TestEnum.TWO);
+        data1.setCustomData2(customData2);
+        data1.setCustomData2Array(new CustomData2[]{customData2});
+
+
+        CustomData data2 = new CustomData();
+        data2.setIntData(2);
+        data2.setEnumData(TestEnum.ONE);
+        CustomData2 customData22 = new CustomData2();
+        customData22.setIntData(20);
+        customData22.setEnumData(TestEnum.ONE);
+        data2.setCustomData2(customData22);
+        data2.setCustomData2Array(new CustomData2[]{customData22});
+
+        CustomData data3 = new CustomData();
+        data3.setIntData(3);
+        data3.setEnumData(TestEnum.THREE);
+        CustomData2 customData23 = new CustomData2();
+        customData23.setIntData(30);
+        customData23.setEnumData(TestEnum.THREE);
+        data3.setCustomData2(customData23);
+        data3.setCustomData2Array(new CustomData2[]{customData23});
+
+
+        CustomData[] param1 = new CustomData[]{data1, data2};
+        CustomData[] param2 = new CustomData[]{data2, data3};
+        CustomData[] param3 = new CustomData[]{data3, data1};
+
+        CustomData[] result = sampleService.testParcelArray(param1, param2, param3);
+
+        Assert.assertEquals(data1.getIntData(), result[0].getIntData());
+        Assert.assertEquals(data1.getEnumData(), result[0].getEnumData());
+
+        Assert.assertEquals(data3.getIntData(), param2[0].getIntData());
+        Assert.assertEquals(data1.getEnumData(), param2[1].getEnumData());
+
+        Assert.assertEquals(data1.getIntData(), param3[0].getIntData());
+        Assert.assertEquals(data2.getEnumData(), param3[1].getEnumData());
+
+    }
+
+    @Test
+    public void testParcelerList() throws RemoteException {
+        CustomData data1 = new CustomData();
+        data1.setIntData(1);
+        data1.setEnumData(TestEnum.TWO);
+        CustomData2 customData2 = new CustomData2();
+        customData2.setIntData(10);
+        customData2.setEnumData(TestEnum.TWO);
+        data1.setCustomData2(customData2);
+        data1.setCustomData2Array(new CustomData2[]{customData2});
+
+
+        CustomData data2 = new CustomData();
+        data2.setIntData(2);
+        data2.setEnumData(TestEnum.ONE);
+        CustomData2 customData22 = new CustomData2();
+        customData22.setIntData(20);
+        customData22.setEnumData(TestEnum.ONE);
+        data2.setCustomData2(customData22);
+        data2.setCustomData2Array(new CustomData2[]{customData22});
+
+        CustomData data3 = new CustomData();
+        data3.setIntData(3);
+        data3.setEnumData(TestEnum.THREE);
+        CustomData2 customData23 = new CustomData2();
+        customData23.setIntData(30);
+        customData23.setEnumData(TestEnum.THREE);
+        data3.setCustomData2(customData23);
+        data3.setCustomData2Array(new CustomData2[]{customData23});
+
+
+        CustomData[] param1 = new CustomData[]{data1, data2};
+        CustomData[] param2 = new CustomData[]{data2, data3};
+        CustomData[] param3 = new CustomData[]{data3, data1};
+
+        List<CustomData> p1 = new ArrayList(Arrays.asList(param1));
+        List<CustomData> p2 = new ArrayList(Arrays.asList(param2));
+        List<CustomData> p3 = new ArrayList(Arrays.asList(param3));
+
+        List<CustomData> result = sampleService.testParcelList(p1, p2, p3);
+
+        Assert.assertEquals(data1.getIntData(), result.get(0).getIntData());
+        Assert.assertEquals(data2.getEnumData(), result.get(1).getEnumData());
+
+        Assert.assertEquals(data3.getIntData(), p2.get(0).getIntData());
+        Assert.assertEquals(data1.getEnumData(), p2.get(1).getEnumData());
+
+        Assert.assertEquals(data1.getIntData(), p3.get(0).getIntData());
+        Assert.assertEquals(data2.getEnumData(), p3.get(1).getEnumData());
+
+
+        List<? extends CustomData> p11 = new ArrayList(Arrays.asList(param1));
+        List<? extends CustomData> p22 = new ArrayList(Arrays.asList(param2));
+        List<? extends CustomData> p33 = new ArrayList(Arrays.asList(param3));
+
+        List<? extends CustomData> result2 = sampleService.testParcelList2(p11, p22, p33);
+
+        Assert.assertEquals(data1.getIntData(), result2.get(0).getIntData());
+        Assert.assertEquals(data2.getEnumData(), result2.get(1).getEnumData());
+
+        Assert.assertEquals(data3.getIntData(), p22.get(0).getIntData());
+        Assert.assertEquals(data1.getEnumData(), p22.get(1).getEnumData());
+
+        Assert.assertEquals(data1.getIntData(), p33.get(0).getIntData());
+        Assert.assertEquals(data2.getEnumData(), p33.get(1).getEnumData());
+
+    }
 
 }
 

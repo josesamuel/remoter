@@ -13,10 +13,10 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 
 import remoter.annotations.Oneway;
 import remoter.annotations.ParamIn;
@@ -76,7 +76,12 @@ class MethodBuilder extends RemoteBuilder {
 
                 //add return if any
                 if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    methodBuilder.addStatement(executableElement.getReturnType().toString() + " result");
+                    TypeElement genericParceler = getBindingManager().getGenericType(executableElement.getReturnType());
+                    if (genericParceler != null) {
+                        methodBuilder.addStatement("$T<$T> result", List.class, genericParceler);
+                    } else {
+                        methodBuilder.addStatement(executableElement.getReturnType().toString() + " result");
+                    }
                 }
 
                 //start main body block
@@ -110,26 +115,26 @@ class MethodBuilder extends RemoteBuilder {
                     methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
                     //read exception if any
                     methodBuilder.addStatement("reply.readException()");
-                }
 
 
-                //read result
-                if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
-                    if (paramBuilder != null) {
-                        paramBuilder.readResultsFromProxy(executableElement.getReturnType(), methodBuilder);
-                    } else {
-                        logError("Unmarshellable return type " + executableElement.getReturnType());
-                        methodBuilder.addStatement("result = null");
+                    //read result
+                    if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
+                        if (paramBuilder != null) {
+                            paramBuilder.readResultsFromProxy(executableElement.getReturnType(), methodBuilder);
+                        } else {
+                            logError("Unmarshellable return type " + executableElement.getReturnType());
+                            methodBuilder.addStatement("result = null");
+                        }
                     }
-                }
 
-                for (VariableElement param : outParams) {
-                    ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                            : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                    if (paramBuilder != null) {
-                        paramBuilder.readOutParamsFromProxy(param, paramType, methodBuilder);
+                    for (VariableElement param : outParams) {
+                        ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                                : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+                        if (paramBuilder != null) {
+                            paramBuilder.readOutParamsFromProxy(param, paramType, methodBuilder);
+                        }
                     }
                 }
 
@@ -238,26 +243,27 @@ class MethodBuilder extends RemoteBuilder {
 
                 if (!isOneWay) {
                     methodBuilder.addStatement("reply.writeNoException()");
-                }
 
-                if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
-                    if (paramBuilder != null) {
-                        paramBuilder.readResultsFromStub(executableElement.getReturnType(), methodBuilder);
-                    } else {
-                        logError("Unmarshallable return type " + executableElement.getReturnType());
-                    }
-                }
 
-                int pIndex = 0;
-                for (VariableElement param : outParams) {
-                    ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                            : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                    if (paramBuilder != null) {
-                        paramBuilder.readOutResultsFromStub(param, paramType, outParamsNames.get(pIndex), methodBuilder);
+                    if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
+                        if (paramBuilder != null) {
+                            paramBuilder.readResultsFromStub(executableElement.getReturnType(), methodBuilder);
+                        } else {
+                            logError("Unmarshallable return type " + executableElement.getReturnType());
+                        }
                     }
-                    pIndex++;
+
+                    int pIndex = 0;
+                    for (VariableElement param : outParams) {
+                        ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                                : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+                        if (paramBuilder != null) {
+                            paramBuilder.readOutResultsFromStub(param, paramType, outParamsNames.get(pIndex), methodBuilder);
+                        }
+                        pIndex++;
+                    }
                 }
 
                 methodBuilder.addStatement("return true");

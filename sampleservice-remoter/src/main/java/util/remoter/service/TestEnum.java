@@ -5,5 +5,6 @@ import org.parceler.Parcel;
 @Parcel
 public enum TestEnum {
     ONE,
-    TWO;
+    TWO,
+    THREE;
 }

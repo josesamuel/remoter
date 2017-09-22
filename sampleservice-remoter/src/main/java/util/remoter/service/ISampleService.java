@@ -54,8 +54,8 @@ public interface ISampleService {
 
     CustomData[] testParcelArray(@ParamIn CustomData[] customData, @ParamOut CustomData[] customData2, CustomData[] customData3);
 
-    List<CustomData> testParcelList(List<CustomData> customData3);
+    List<CustomData> testParcelList(@ParamIn List<CustomData> customData1, @ParamOut List<CustomData> customData2, List<CustomData> customData3);
 
-    List<? extends CustomData> testParcelList2(List<? extends CustomData> customData3);
+    List<? extends CustomData> testParcelList2(@ParamIn List<? extends CustomData> customData1, @ParamOut List<? extends CustomData> customData2, List<? extends CustomData> customData3);
 
 }
