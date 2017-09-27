@@ -36,7 +36,7 @@ public interface ISampleService {
 * No messy **.aidl**, just plain simple **interface**
 * Implement the interface directly using intuitive normal java way, instead of extending Stub
 * **Fully interoperable with AIDL**. Remoter creates the same serialized data as created by AIDL, so it is fully interoperable with AIDL
-* Supports more data types than AIDL, everything supported by Parcelable
+* Supports more data types than AIDL, everything supported by Parcel
 * Remoter is an **annotation processor** that generates two helper classes during build time -- a client side Proxy and a service side Stub that allows you to wrap your interface and implementation
 
 
@@ -77,6 +77,7 @@ Gradle dependency
 
 ```groovy
 dependencies {
+	//Replace "api" with "compile" for pre AndroidStudio 3
     api 'com.josesamuel:remoter-annotations:1.0.2'
     annotationProcessor 'com.josesamuel:remoter:1.0.2'
 }

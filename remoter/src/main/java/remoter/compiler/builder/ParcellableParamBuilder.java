@@ -112,7 +112,12 @@ class ParcellableParamBuilder extends ParamBuilder {
 
     private String getParcelableClassName(TypeMirror typeMirror) {
         if (typeMirror.getKind() != TypeKind.ARRAY) {
-            return typeMirror.toString();
+            String pClassName = typeMirror.toString();
+            int genericStartIndex = pClassName.indexOf('<');
+            if (genericStartIndex != -1) {
+                pClassName = pClassName.substring(0, genericStartIndex).trim();
+            }
+            return pClassName;
         } else {
             return getParcelableClassName(((ArrayType) typeMirror).getComponentType());
         }

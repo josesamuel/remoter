@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by jmails on 8/20/17.
  */
 
-public class FooParcelable implements Parcelable {
+public class FooParcelable<T> implements Parcelable {
 
     public static final Creator<FooParcelable> CREATOR = new Creator<FooParcelable>() {
         @Override
