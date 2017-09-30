@@ -53,6 +53,7 @@ class ClassBuilder extends RemoteBuilder {
         return JavaFile.builder(proxyClassName.packageName(), proxyClassBuilder.build());
     }
 
+
     public JavaFile.Builder buildStubClass() {
         ClassName stubClassName = getStubClassName();
 

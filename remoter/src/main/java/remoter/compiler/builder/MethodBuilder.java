@@ -163,6 +163,8 @@ class MethodBuilder extends RemoteBuilder {
                 methodIndex++;
             }
         }
+
+        addProxyExtras(classBuilder);
     }
 
     /**
@@ -288,5 +290,49 @@ class MethodBuilder extends RemoteBuilder {
         classBuilder.addMethod(methodBuilder.build());
     }
 
+
+    /**
+     * Add other extra methods
+     */
+    private void addProxyExtras(TypeSpec.Builder classBuilder) {
+        addProxyDeathMethod(classBuilder, "linkToDeath", "Register a {@link android.os.IBinder.DeathRecipient} to know of binder connection lose\n");
+        addProxyDeathMethod(classBuilder, "unlinkToDeath", "UnRegisters a {@link android.os.IBinder.DeathRecipient}\n");
+        addProxyRemoteAlive(classBuilder);
+    }
+
+    /**
+     * Add proxy method that exposes the linkToDeath
+     */
+    private void addProxyDeathMethod(TypeSpec.Builder classBuilder, String deathMethod, String doc) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(deathMethod)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.VOID)
+                .addParameter(ClassName.get("android.os", "IBinder.DeathRecipient"), "deathRecipient")
+                .beginControlFlow("try")
+                .addStatement("mRemote." + deathMethod + "(deathRecipient, 0)")
+                .endControlFlow()
+                .beginControlFlow("catch ($T ignored)", Exception.class)
+                .endControlFlow()
+                .addJavadoc(doc);
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * Add proxy method that exposes whether remote is alive
+     */
+    private void addProxyRemoteAlive(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("isRemoteAlive")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(boolean.class)
+                .addStatement("boolean alive = false")
+                .beginControlFlow("try")
+                .addStatement("alive = mRemote.isBinderAlive()")
+                .endControlFlow()
+                .beginControlFlow("catch ($T ignored)", Exception.class)
+                .endControlFlow()
+                .addStatement("return alive")
+                .addJavadoc("Checks whether the remote process is alive\n");
+        classBuilder.addMethod(methodBuilder.build());
+    }
 
 }
