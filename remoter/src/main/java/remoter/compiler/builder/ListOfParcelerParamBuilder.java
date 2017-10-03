@@ -34,7 +34,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
                 methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " != null)");
                 methodBuilder.addStatement("data.writeInt(" + param.getSimpleName() + ".size())");
                 methodBuilder.beginControlFlow("for($T item:" + param.getSimpleName() + " )", genericType);
-                methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(data, 0)");
+                methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(data, 0)");
                 methodBuilder.endControlFlow();
                 methodBuilder.endControlFlow();
                 methodBuilder.beginControlFlow("else");
@@ -52,7 +52,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("if (result != null)");
             methodBuilder.addStatement("reply.writeInt(result.size())");
             methodBuilder.beginControlFlow("for($T item:result )", genericType);
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
@@ -66,7 +66,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
         methodBuilder.beginControlFlow("if (" + paramName + " != null)");
         methodBuilder.addStatement("reply.writeInt(" + paramName + ".size())");
         methodBuilder.beginControlFlow("for($T item:" + paramName + " )", genericType);
-        methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+        methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
         methodBuilder.endControlFlow();
         methodBuilder.endControlFlow();
         methodBuilder.beginControlFlow("else");

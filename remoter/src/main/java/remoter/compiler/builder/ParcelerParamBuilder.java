@@ -31,7 +31,7 @@ class ParcelerParamBuilder extends ParamBuilder {
                 methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " != null)");
                 methodBuilder.addStatement("data.writeInt(" + param.getSimpleName() + ".length)");
                 methodBuilder.beginControlFlow("for($T item:" + param.getSimpleName() + " )", ((ArrayType) param.asType()).getComponentType());
-                methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(data, 0)");
+                methodBuilder.addStatement("org.parceler.Parcels.wrap(" + ((ArrayType) param.asType()).getComponentType().toString() + ".class, item).writeToParcel(data, 0)");
                 methodBuilder.endControlFlow();
                 methodBuilder.endControlFlow();
                 methodBuilder.beginControlFlow("else");
@@ -43,7 +43,7 @@ class ParcelerParamBuilder extends ParamBuilder {
         } else {
             methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " != null)");
             methodBuilder.addStatement("data.writeInt(1)");
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + param.getSimpleName() + ").writeToParcel(data, 0)");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + param.asType().toString() + ".class, " + param.getSimpleName() + ").writeToParcel(data, 0)");
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("data.writeInt(0)");
@@ -57,7 +57,7 @@ class ParcelerParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("if (result != null)");
             methodBuilder.addStatement("reply.writeInt(result.length)");
             methodBuilder.beginControlFlow("for($T item:result )", ((ArrayType) resultType).getComponentType());
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + ((ArrayType) resultType).getComponentType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
@@ -67,7 +67,7 @@ class ParcelerParamBuilder extends ParamBuilder {
         } else {
             methodBuilder.beginControlFlow("if (result != null)");
             methodBuilder.addStatement("reply.writeInt(1)");
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(result).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + resultType.toString() + ".class, result).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("reply.writeInt(0)");
@@ -81,7 +81,7 @@ class ParcelerParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("if (" + paramName + " != null)");
             methodBuilder.addStatement("reply.writeInt(" + paramName + ".length)");
             methodBuilder.beginControlFlow("for($T item:" + paramName + " )", ((ArrayType) param.asType()).getComponentType());
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + ((ArrayType) param.asType()).getComponentType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
