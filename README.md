@@ -17,6 +17,7 @@ Some of the **problems and limitations of AIDL** are :
 * Only limited predefined data types are supported in aidl
 * Any custom Parcelable class that you want to pass through the interface has to be defined again as another ".aidl" file!
 * No overloaded methods!- Methods with same name fail
+* Can't extend an aidl with another
 
 ## Remoter - An intuitive way for Android IPC
 
@@ -37,6 +38,7 @@ public interface ISampleService {
 * Implement the interface directly using intuitive normal java way, instead of extending Stub
 * **Fully interoperable with AIDL**. Remoter creates the same serialized data as created by AIDL, so it is fully interoperable with AIDL
 * Supports more data types than AIDL, everything supported by Parcel
+* Make an interface that extends other interfaces as @Remoter
 * Remoter is an **annotation processor** that generates two helper classes during build time -- a client side Proxy and a service side Stub that allows you to wrap your interface and implementation
 
 
@@ -78,8 +80,8 @@ Gradle dependency
 ```groovy
 dependencies {
 	//Replace "api" with "compile" for pre AndroidStudio 3
-    api 'com.josesamuel:remoter-annotations:1.0.5'
-    annotationProcessor 'com.josesamuel:remoter:1.0.5'
+    api 'com.josesamuel:remoter-annotations:1.1.0'
+    annotationProcessor 'com.josesamuel:remoter:1.1.0'
 }
 ```
 

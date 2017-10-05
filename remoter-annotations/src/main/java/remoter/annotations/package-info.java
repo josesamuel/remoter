@@ -49,9 +49,9 @@
  * <p>
  * To add Remoter to your project add these to its gradle <b>dependencies</b>:
  * <br/>
- *  <b>api 'com.josesamuel:remoter-annotations:1.0.1'</b>
+ *  <b>api 'com.josesamuel:remoter-annotations:1.1.0'</b>
  * <br/>
- *  <b>annotationProcessor 'com.josesamuel:remoter:1.0.1'</b>
+ *  <b>annotationProcessor 'com.josesamuel:remoter:1.1.0'</b>
  * </p>
  * <br/>
  *

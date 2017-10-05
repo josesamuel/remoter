@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.1.0 *(2017-10-4)*
+----------------------------
+
+Supports extending other interfaces
+
 Version 1.0.4 *(2017-09-30)*
 ----------------------------
 

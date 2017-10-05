@@ -15,6 +15,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
@@ -27,7 +28,6 @@ import remoter.annotations.ParamOut;
  */
 class MethodBuilder extends RemoteBuilder {
 
-
     protected MethodBuilder(Messager messager, Element element) {
         super(messager, element);
     }
@@ -36,136 +36,142 @@ class MethodBuilder extends RemoteBuilder {
      * Build the proxy methods
      */
     public void addProxyMethods(TypeSpec.Builder classBuilder) {
-
-        int methodIndex = 0;
-        for (Element member : getRemoterInterfaceElement().getEnclosedElements()) {
-            if (member.getKind() == ElementKind.METHOD) {
-                ExecutableElement executableElement = (ExecutableElement) member;
-                String methodName = executableElement.getSimpleName().toString();
-                boolean isOnewayAnnotated = member.getAnnotation(Oneway.class) != null;
-                boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
-                        && isOnewayAnnotated;
-
-                if (!isOneWay && isOnewayAnnotated) {
-                    logWarning("@Oneway is expected only for methods with void return. Ignoring it for " + member.getSimpleName());
-                }
-
-
-                MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Override.class)
-                        .returns(TypeName.get(executableElement.getReturnType()));
-
-                //add Exceptions
-                for (TypeMirror exceptions : executableElement.getThrownTypes()) {
-                    methodBuilder.addException(ClassName.bestGuess(exceptions.toString()));
-                }
-
-                //add parameters
-                for (VariableElement params : executableElement.getParameters()) {
-                    methodBuilder.addParameter(TypeName.get(params.asType()), params.getSimpleName().toString());
-                }
-
-                //add statements
-                methodBuilder
-                        .addStatement("android.os.Parcel data = android.os.Parcel.obtain()");
-
-                if (!isOneWay) {
-                    methodBuilder.addStatement("android.os.Parcel reply = android.os.Parcel.obtain()");
-                }
-
-                //add return if any
-                if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    TypeElement genericParceler = getBindingManager().getGenericType(executableElement.getReturnType());
-                    if (genericParceler != null) {
-                        methodBuilder.addStatement("$T<$T> result", List.class, genericParceler);
-                    } else {
-                        methodBuilder.addStatement(executableElement.getReturnType().toString() + " result");
-                    }
-                }
-
-                //start main body block
-                methodBuilder.beginControlFlow("try");
-
-                //write the descriptor
-                methodBuilder.addStatement("data.writeInterfaceToken(DESCRIPTOR)");
-
-                List<VariableElement> outParams = new ArrayList<>();
-
-                //pass parameters
-                for (VariableElement param : executableElement.getParameters()) {
-                    ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                            : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-
-                    if (paramType != ParamBuilder.ParamType.IN) {
-                        outParams.add(param);
-                    }
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                    if (paramBuilder != null) {
-                        paramBuilder.writeParamsToProxy(param, paramType, methodBuilder);
-                    } else {
-                        logError("Parameter cannot be marshalled " + param.getSimpleName());
-                    }
-                }
-
-                //send remote command
-                if (isOneWay) {
-                    methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, null, android.os.IBinder.FLAG_ONEWAY)");
-                } else {
-                    methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
-                    //read exception if any
-                    methodBuilder.addStatement("reply.readException()");
-
-
-                    //read result
-                    if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
-                        if (paramBuilder != null) {
-                            paramBuilder.readResultsFromProxy(executableElement.getReturnType(), methodBuilder);
-                        } else {
-                            logError("Unmarshellable return type " + executableElement.getReturnType());
-                            methodBuilder.addStatement("result = null");
-                        }
-                    }
-
-                    for (VariableElement param : outParams) {
-                        ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                                : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                        if (paramBuilder != null) {
-                            paramBuilder.readOutParamsFromProxy(param, paramType, methodBuilder);
-                        }
-                    }
-                }
-
-                //end of try
-                methodBuilder.endControlFlow();
-
-
-                //catch rethrow
-                methodBuilder.beginControlFlow("catch ($T re)", ClassName.get("android.os", "RemoteException"));
-                methodBuilder.addStatement("throw new $T(re)", RuntimeException.class);
-                methodBuilder.endControlFlow();
-
-
-                //finally block
-                methodBuilder.beginControlFlow("finally");
-                if (!isOneWay) {
-                    methodBuilder.addStatement("reply.recycle()");
-                }
-                methodBuilder.addStatement("data.recycle()");
-                methodBuilder.endControlFlow();
-                if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    methodBuilder.addStatement("return result");
-                }
-
-                classBuilder.addMethod(methodBuilder.build());
-                methodIndex++;
+        processRemoterElements(classBuilder, new ElementVisitor() {
+            @Override
+            public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
+                addProxyMethods(classBuilder, member, methodIndex);
             }
-        }
+        }, null);
 
         addProxyExtras(classBuilder);
     }
+
+    /**
+     * Build the proxy methods
+     */
+    private void addProxyMethods(TypeSpec.Builder classBuilder, Element member, int methodIndex) {
+        ExecutableElement executableElement = (ExecutableElement) member;
+        String methodName = executableElement.getSimpleName().toString();
+        boolean isOnewayAnnotated = member.getAnnotation(Oneway.class) != null;
+        boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
+                && isOnewayAnnotated;
+
+        if (!isOneWay && isOnewayAnnotated) {
+            logWarning("@Oneway is expected only for methods with void return. Ignoring it for " + member.getSimpleName());
+        }
+
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(TypeName.get(executableElement.getReturnType()));
+
+        //add Exceptions
+        for (TypeMirror exceptions : executableElement.getThrownTypes()) {
+            methodBuilder.addException(ClassName.bestGuess(exceptions.toString()));
+        }
+
+        //add parameters
+        for (VariableElement params : executableElement.getParameters()) {
+            methodBuilder.addParameter(TypeName.get(params.asType()), params.getSimpleName().toString());
+        }
+
+        //add statements
+        methodBuilder
+                .addStatement("android.os.Parcel data = android.os.Parcel.obtain()");
+
+        if (!isOneWay) {
+            methodBuilder.addStatement("android.os.Parcel reply = android.os.Parcel.obtain()");
+        }
+
+        //add return if any
+        if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+            TypeElement genericParceler = getBindingManager().getGenericType(executableElement.getReturnType());
+            if (genericParceler != null) {
+                methodBuilder.addStatement("$T<$T> result", List.class, genericParceler);
+            } else {
+                methodBuilder.addStatement(executableElement.getReturnType().toString() + " result");
+            }
+        }
+
+        //start main body block
+        methodBuilder.beginControlFlow("try");
+
+        //write the descriptor
+        methodBuilder.addStatement("data.writeInterfaceToken(DESCRIPTOR)");
+
+        List<VariableElement> outParams = new ArrayList<>();
+
+        //pass parameters
+        for (VariableElement param : executableElement.getParameters()) {
+            ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                    : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+
+            if (paramType != ParamBuilder.ParamType.IN) {
+                outParams.add(param);
+            }
+            ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+            if (paramBuilder != null) {
+                paramBuilder.writeParamsToProxy(param, paramType, methodBuilder);
+            } else {
+                logError("Parameter cannot be marshalled " + param.getSimpleName());
+            }
+        }
+
+        //send remote command
+        if (isOneWay) {
+            methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, null, android.os.IBinder.FLAG_ONEWAY)");
+        } else {
+            methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
+            //read exception if any
+            methodBuilder.addStatement("reply.readException()");
+
+
+            //read result
+            if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+                ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
+                if (paramBuilder != null) {
+                    paramBuilder.readResultsFromProxy(executableElement.getReturnType(), methodBuilder);
+                } else {
+                    logError("Unmarshellable return type " + executableElement.getReturnType());
+                    methodBuilder.addStatement("result = null");
+                }
+            }
+
+            for (VariableElement param : outParams) {
+                ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                        : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+                ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+                if (paramBuilder != null) {
+                    paramBuilder.readOutParamsFromProxy(param, paramType, methodBuilder);
+                }
+            }
+        }
+
+        //end of try
+        methodBuilder.endControlFlow();
+
+
+        //catch rethrow
+        methodBuilder.beginControlFlow("catch ($T re)", ClassName.get("android.os", "RemoteException"));
+        methodBuilder.addStatement("throw new $T(re)", RuntimeException.class);
+        methodBuilder.endControlFlow();
+
+
+        //finally block
+        methodBuilder.beginControlFlow("finally");
+        if (!isOneWay) {
+            methodBuilder.addStatement("reply.recycle()");
+        }
+        methodBuilder.addStatement("data.recycle()");
+        methodBuilder.endControlFlow();
+        if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+            methodBuilder.addStatement("return result");
+        }
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
 
     /**
      * Build the stub methods
@@ -190,91 +196,13 @@ class MethodBuilder extends RemoteBuilder {
         methodBuilder.addStatement("return true");
         methodBuilder.endControlFlow();
 
-        int methodIndex = 0;
-        for (Element member : getRemoterInterfaceElement().getEnclosedElements()) {
-            if (member.getKind() == ElementKind.METHOD) {
-                ExecutableElement executableElement = (ExecutableElement) member;
-                String methodName = executableElement.getSimpleName().toString();
-                boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
-                        && member.getAnnotation(Oneway.class) != null;
-
-
-                methodBuilder.beginControlFlow("case TRANSACTION_" + methodName + "_" + methodIndex + ":");
-
-                methodBuilder.addStatement("data.enforceInterface(DESCRIPTOR)");
-                List<String> paramNames = new ArrayList<>();
-                int paramIndex = 0;
-                List<VariableElement> outParams = new ArrayList<>();
-                List<String> outParamsNames = new ArrayList<>();
-
-                //pass parameters
-                for (VariableElement param : executableElement.getParameters()) {
-                    ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                            : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-
-                    ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                    if (paramBuilder != null) {
-                        String paramName = "arg_stb_" + paramIndex;
-                        paramNames.add(paramName);
-                        paramBuilder.writeParamsToStub(param, paramType, paramName, methodBuilder);
-                        if (paramType != ParamBuilder.ParamType.IN) {
-                            outParams.add(param);
-                            outParamsNames.add(paramName);
-                        }
-                    } else {
-                        logError("Parameter cannot be marshalled " + param.getSimpleName());
-                    }
-                    paramIndex++;
-                }
-
-                String methodCall = "serviceImpl." + methodName + "(";
-                int paramSize = paramNames.size();
-                for (int paramCount = 0; paramCount < paramSize; paramCount++) {
-                    methodCall += paramNames.get(paramCount);
-                    if (paramCount < paramSize - 1) {
-                        methodCall += ", ";
-                    }
-                }
-                methodCall += ")";
-
-                if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                    methodBuilder.addStatement("$T result = " + methodCall, executableElement.getReturnType());
-                } else {
-                    methodBuilder.addStatement(methodCall);
-                }
-
-                if (!isOneWay) {
-                    methodBuilder.addStatement("reply.writeNoException()");
-
-
-                    if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
-                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
-                        if (paramBuilder != null) {
-                            paramBuilder.readResultsFromStub(executableElement.getReturnType(), methodBuilder);
-                        } else {
-                            logError("Unmarshallable return type " + executableElement.getReturnType());
-                        }
-                    }
-
-                    int pIndex = 0;
-                    for (VariableElement param : outParams) {
-                        ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
-                                : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
-                        ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
-                        if (paramBuilder != null) {
-                            paramBuilder.readOutResultsFromStub(param, paramType, outParamsNames.get(pIndex), methodBuilder);
-                        }
-                        pIndex++;
-                    }
-                }
-
-                methodBuilder.addStatement("return true");
-                methodBuilder.endControlFlow();
-
-
-                methodIndex++;
+        processRemoterElements(classBuilder, new ElementVisitor() {
+            @Override
+            public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
+                addStubMethods(classBuilder, member, methodIndex, methodBuilder);
             }
-        }
+        }, methodBuilder);
+
 
         //end switch
         methodBuilder.endControlFlow();
@@ -288,6 +216,90 @@ class MethodBuilder extends RemoteBuilder {
 
         methodBuilder.addStatement("return super.onTransact(code, data, reply, flags)");
         classBuilder.addMethod(methodBuilder.build());
+
+    }
+
+    /**
+     * Called from the {@link RemoteBuilder.ElementVisitor} callback
+     */
+    private void addStubMethods(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
+        ExecutableElement executableElement = (ExecutableElement) member;
+        String methodName = executableElement.getSimpleName().toString();
+        boolean isOneWay = executableElement.getReturnType().getKind() == TypeKind.VOID
+                && member.getAnnotation(Oneway.class) != null;
+
+
+        methodBuilder.beginControlFlow("case TRANSACTION_" + methodName + "_" + methodIndex + ":");
+
+        methodBuilder.addStatement("data.enforceInterface(DESCRIPTOR)");
+        List<String> paramNames = new ArrayList<>();
+        int paramIndex = 0;
+        List<VariableElement> outParams = new ArrayList<>();
+        List<String> outParamsNames = new ArrayList<>();
+
+        //pass parameters
+        for (VariableElement param : executableElement.getParameters()) {
+            ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                    : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+
+            ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+            if (paramBuilder != null) {
+                String paramName = "arg_stb_" + paramIndex;
+                paramNames.add(paramName);
+                paramBuilder.writeParamsToStub(param, paramType, paramName, methodBuilder);
+                if (paramType != ParamBuilder.ParamType.IN) {
+                    outParams.add(param);
+                    outParamsNames.add(paramName);
+                }
+            } else {
+                logError("Parameter cannot be marshalled " + param.getSimpleName());
+            }
+            paramIndex++;
+        }
+
+        String methodCall = "serviceImpl." + methodName + "(";
+        int paramSize = paramNames.size();
+        for (int paramCount = 0; paramCount < paramSize; paramCount++) {
+            methodCall += paramNames.get(paramCount);
+            if (paramCount < paramSize - 1) {
+                methodCall += ", ";
+            }
+        }
+        methodCall += ")";
+
+        if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+            methodBuilder.addStatement("$T result = " + methodCall, executableElement.getReturnType());
+        } else {
+            methodBuilder.addStatement(methodCall);
+        }
+
+        if (!isOneWay) {
+            methodBuilder.addStatement("reply.writeNoException()");
+
+
+            if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
+                ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(executableElement.getReturnType());
+                if (paramBuilder != null) {
+                    paramBuilder.readResultsFromStub(executableElement.getReturnType(), methodBuilder);
+                } else {
+                    logError("Unmarshallable return type " + executableElement.getReturnType());
+                }
+            }
+
+            int pIndex = 0;
+            for (VariableElement param : outParams) {
+                ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
+                        : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
+                ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
+                if (paramBuilder != null) {
+                    paramBuilder.readOutResultsFromStub(param, paramType, outParamsNames.get(pIndex), methodBuilder);
+                }
+                pIndex++;
+            }
+        }
+
+        methodBuilder.addStatement("return true");
+        methodBuilder.endControlFlow();
     }
 
 

@@ -23,6 +23,7 @@ import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.CustomData;
 import util.remoter.service.CustomData2;
 import util.remoter.service.FooParcelable;
+import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
 import util.remoter.service.ISampleService_Proxy;
@@ -522,8 +523,14 @@ public class RemoterClientToRemoterServerTest {
 
         Assert.assertEquals(data1.getIntData(), p33.get(0).getIntData());
         Assert.assertEquals(data2.getEnumData(), p33.get(1).getEnumData());
-
     }
 
+    @Test
+    public void testExtendedRemoter() throws RemoteException {
+        IExtE extE = sampleService.getExtE();
+        Assert.assertEquals(1, extE.echoInt(1));
+        Assert.assertEquals("ab", extE.echoString("a", "b"));
+        Assert.assertEquals(3, extE.echoLong(1, 2));
+    }
 }
 

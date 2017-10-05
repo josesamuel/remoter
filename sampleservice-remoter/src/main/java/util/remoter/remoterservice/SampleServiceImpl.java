@@ -7,6 +7,7 @@ import java.util.Map;
 
 import util.remoter.service.CustomData;
 import util.remoter.service.FooParcelable;
+import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
 
@@ -207,5 +208,10 @@ public class SampleServiceImpl implements ISampleService {
         ((List<CustomData>) customData3).addAll(customData1);
 
         return customData1;
+    }
+
+    @Override
+    public IExtE getExtE() {
+        return new ExtEImpl();
     }
 }

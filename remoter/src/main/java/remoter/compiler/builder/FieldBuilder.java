@@ -2,6 +2,7 @@ package remoter.compiler.builder;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
@@ -26,12 +27,25 @@ class FieldBuilder extends RemoteBuilder {
         classBuilder.addField(FieldSpec.builder(ClassName.get("android.os", "IBinder"), "mRemote")
                 .addModifiers(Modifier.PRIVATE).build());
         addCommonFields(classBuilder);
+        processRemoterElements(classBuilder, new ElementVisitor() {
+            @Override
+            public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
+                addCommonFields(classBuilder, member, methodIndex);
+            }
+        }, null);
+
     }
 
     public void addStubFields(TypeSpec.Builder classBuilder) {
         classBuilder.addField(FieldSpec.builder(TypeName.get(getRemoterInterfaceElement().asType()), "serviceImpl")
                 .addModifiers(Modifier.PRIVATE).build());
         addCommonFields(classBuilder);
+        processRemoterElements(classBuilder, new ElementVisitor() {
+            @Override
+            public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
+                addCommonFields(classBuilder, member, methodIndex);
+            }
+        }, null);
     }
 
     private void addCommonFields(TypeSpec.Builder classBuilder) {
@@ -41,18 +55,12 @@ class FieldBuilder extends RemoteBuilder {
                 .initializer("\"" + getRemoterInterfacePackageName() + "." + getRemoterInterfaceClassName() + "\"")
                 .build());
 
-        //Add one for each methods
-        int methodIndex = 0;
-        for (Element member : getRemoterInterfaceElement().getEnclosedElements()) {
-            if (member.getKind() == ElementKind.METHOD) {
-                String methodName = member.getSimpleName().toString();
+    }
 
-                classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION_" + methodName + "_" + methodIndex)
-                        .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-                        .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + methodIndex).build());
-                methodIndex++;
-            }
-        }
-
+    private void addCommonFields(TypeSpec.Builder classBuilder, Element member, int methodIndex) {
+        String methodName = member.getSimpleName().toString();
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION_" + methodName + "_" + methodIndex)
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + methodIndex).build());
     }
 }

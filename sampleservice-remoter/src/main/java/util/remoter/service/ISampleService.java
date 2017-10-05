@@ -58,4 +58,6 @@ public interface ISampleService {
 
     List<? extends CustomData> testParcelList2(@ParamIn List<? extends CustomData> customData1, @ParamOut List<? extends CustomData> customData2, List<? extends CustomData> customData3);
 
+    IExtE getExtE();
+
 }
