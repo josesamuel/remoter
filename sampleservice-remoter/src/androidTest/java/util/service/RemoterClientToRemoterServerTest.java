@@ -22,6 +22,8 @@ import java.util.Map;
 import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.CustomData;
 import util.remoter.service.CustomData2;
+import util.remoter.service.ExtCustomData;
+import util.remoter.service.ExtCustomData2;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
@@ -382,7 +384,7 @@ public class RemoterClientToRemoterServerTest {
         data1.setCustomData2Array(new CustomData2[]{customData2});
 
 
-        CustomData data2 = new CustomData();
+        CustomData data2 = new ExtCustomData();
         data2.setIntData(2);
         data2.setEnumData(TestEnum.ONE);
         CustomData2 customData22 = new CustomData2();
@@ -391,7 +393,7 @@ public class RemoterClientToRemoterServerTest {
         data2.setCustomData2(customData22);
         data2.setCustomData2Array(new CustomData2[]{customData22});
 
-        CustomData data3 = new CustomData();
+        CustomData data3 = new ExtCustomData();
         data3.setIntData(3);
         data3.setEnumData(TestEnum.THREE);
         CustomData2 customData23 = new CustomData2();
@@ -403,6 +405,7 @@ public class RemoterClientToRemoterServerTest {
 
         CustomData result = sampleService.testParcel(data1, data2, data3);
 
+        Assert.assertTrue(result instanceof ExtCustomData);
         Assert.assertEquals(3, result.getIntData());
         Assert.assertEquals(TestEnum.THREE, result.getEnumData());
 
@@ -412,7 +415,7 @@ public class RemoterClientToRemoterServerTest {
 
     @Test
     public void testParcelerArray() throws RemoteException {
-        CustomData data1 = new CustomData();
+        CustomData data1 = new ExtCustomData2();
         data1.setIntData(1);
         data1.setEnumData(TestEnum.TWO);
         CustomData2 customData2 = new CustomData2();
@@ -422,7 +425,7 @@ public class RemoterClientToRemoterServerTest {
         data1.setCustomData2Array(new CustomData2[]{customData2});
 
 
-        CustomData data2 = new CustomData();
+        CustomData data2 = new ExtCustomData();
         data2.setIntData(2);
         data2.setEnumData(TestEnum.ONE);
         CustomData2 customData22 = new CustomData2();
@@ -460,7 +463,7 @@ public class RemoterClientToRemoterServerTest {
 
     @Test
     public void testParcelerList() throws RemoteException {
-        CustomData data1 = new CustomData();
+        CustomData data1 = new ExtCustomData2();
         data1.setIntData(1);
         data1.setEnumData(TestEnum.TWO);
         CustomData2 customData2 = new CustomData2();
@@ -479,7 +482,7 @@ public class RemoterClientToRemoterServerTest {
         data2.setCustomData2(customData22);
         data2.setCustomData2Array(new CustomData2[]{customData22});
 
-        CustomData data3 = new CustomData();
+        CustomData data3 = new ExtCustomData();
         data3.setIntData(3);
         data3.setEnumData(TestEnum.THREE);
         CustomData2 customData23 = new CustomData2();

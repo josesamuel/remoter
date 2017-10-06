@@ -44,6 +44,7 @@ class MethodBuilder extends RemoteBuilder {
         }, null);
 
         addProxyExtras(classBuilder);
+        addCommonExtras(classBuilder);
     }
 
     /**
@@ -216,6 +217,7 @@ class MethodBuilder extends RemoteBuilder {
 
         methodBuilder.addStatement("return super.onTransact(code, data, reply, flags)");
         classBuilder.addMethod(methodBuilder.build());
+        addCommonExtras(classBuilder);
 
     }
 
@@ -300,6 +302,59 @@ class MethodBuilder extends RemoteBuilder {
 
         methodBuilder.addStatement("return true");
         methodBuilder.endControlFlow();
+    }
+
+
+    /**
+     * Add common extra methods
+     */
+    private void addCommonExtras(TypeSpec.Builder classBuilder) {
+        addGetParcelClass(classBuilder);
+        addGetParcelObject(classBuilder);
+    }
+
+    /**
+     * getParcelClass method
+     */
+    private void addGetParcelClass(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("getParcelerClass")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(Class.class)
+                .addParameter(Object.class, "object")
+                .addStatement("Class objClass = object.getClass()")
+                .addStatement("boolean found = false")
+                .beginControlFlow("while(!found)")
+                .beginControlFlow("try")
+                .addStatement("Class.forName(objClass.getName() + \"$$$$Parcelable\")")
+                .addStatement("found = true")
+                .endControlFlow()
+                .beginControlFlow("catch (ClassNotFoundException ignored)")
+                .addStatement("objClass = objClass.getSuperclass()")
+                .endControlFlow()
+                .endControlFlow()
+                .addStatement("return objClass");
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * getParcelObject method
+     */
+    private void addGetParcelObject(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("getParcelerObject")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(Object.class)
+                .addParameter(String.class, "pClassName")
+                .addParameter(ClassName.get("android.os", "Parcel"), "data")
+                .beginControlFlow("try")
+                .addStatement("$T p = null", ClassName.get("android.os", "Parcelable"))
+                .addStatement("$T creator  = (Parcelable.Creator)Class.forName(pClassName+\"$$$$Parcelable\").getField(\"CREATOR\").get(null)", ClassName.get("android.os", "Parcelable.Creator"))
+                .addStatement("Object pWrapper = creator.createFromParcel(data)")
+                .addStatement("return pWrapper.getClass().getMethod(\"getParcel\", (Class[])null).invoke(pWrapper)")
+                .endControlFlow()
+                .beginControlFlow("catch (Exception ignored)")
+                .addStatement("return null")
+                .endControlFlow();
+        classBuilder.addMethod(methodBuilder.build());
     }
 
 

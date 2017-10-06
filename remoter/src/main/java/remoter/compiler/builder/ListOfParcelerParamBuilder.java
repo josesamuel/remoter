@@ -34,7 +34,9 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
                 methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " != null)");
                 methodBuilder.addStatement("data.writeInt(" + param.getSimpleName() + ".size())");
                 methodBuilder.beginControlFlow("for($T item:" + param.getSimpleName() + " )", genericType);
-                methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(data, 0)");
+                methodBuilder.addStatement("Class pClass = getParcelerClass(item)");
+                methodBuilder.addStatement("data.writeString(pClass.getName())");
+                methodBuilder.addStatement("org.parceler.Parcels.wrap(pClass, item).writeToParcel(data, 0)");
                 methodBuilder.endControlFlow();
                 methodBuilder.endControlFlow();
                 methodBuilder.beginControlFlow("else");
@@ -52,7 +54,9 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("if (result != null)");
             methodBuilder.addStatement("reply.writeInt(result.size())");
             methodBuilder.beginControlFlow("for($T item:result )", genericType);
-            methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("Class pClass = getParcelerClass(item)");
+            methodBuilder.addStatement("reply.writeString(pClass.getName())");
+            methodBuilder.addStatement("org.parceler.Parcels.wrap(pClass, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
@@ -66,7 +70,9 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
         methodBuilder.beginControlFlow("if (" + paramName + " != null)");
         methodBuilder.addStatement("reply.writeInt(" + paramName + ".size())");
         methodBuilder.beginControlFlow("for($T item:" + paramName + " )", genericType);
-        methodBuilder.addStatement("org.parceler.Parcels.wrap(" + genericType.asType().toString() + ".class, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+        methodBuilder.addStatement("Class pClass = getParcelerClass(item)");
+        methodBuilder.addStatement("reply.writeString(pClass.getName())");
+        methodBuilder.addStatement("org.parceler.Parcels.wrap(pClass, item).writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
         methodBuilder.endControlFlow();
         methodBuilder.endControlFlow();
         methodBuilder.beginControlFlow("else");
@@ -83,7 +89,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
             methodBuilder.addStatement("result = new $T()", ArrayList.class);
             methodBuilder.addStatement("int size_result = reply.readInt()");
             methodBuilder.beginControlFlow("for(int i=0; i<size_result; i++)");
-            methodBuilder.addStatement("result.add(" + getParcelableClassName(genericType.asType()) + ".CREATOR.createFromParcel(reply).getParcel())");
+            methodBuilder.addStatement("result.add(($T)getParcelerObject(reply.readString(), reply))", genericType.asType());
             methodBuilder.endControlFlow();
         }
     }
@@ -102,7 +108,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
                 //read
                 methodBuilder.addStatement("int size_" + paramName + " = data.readInt()");
                 methodBuilder.beginControlFlow("for(int i=0; i<size_" + paramName + "; i++)");
-                methodBuilder.addStatement(paramName + ".add(" + getParcelableClassName(genericType.asType()) + ".CREATOR.createFromParcel(data).getParcel())");
+                methodBuilder.addStatement(paramName + ".add(($T)getParcelerObject(data.readString(), data))", genericType.asType());
                 methodBuilder.endControlFlow();
             }
         }
@@ -115,23 +121,10 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("if(size_" + param.getSimpleName() + " >= 0)");
             methodBuilder.addStatement(param.getSimpleName() + ".clear()");
             methodBuilder.beginControlFlow("for(int i=0; i<size_" + param.getSimpleName() + "; i++)");
-            methodBuilder.addStatement("((List)" + param.getSimpleName() + ").add(" + getParcelableClassName(genericType.asType()) + ".CREATOR.createFromParcel(reply).getParcel())");
+            methodBuilder.addStatement("((List)" + param.getSimpleName() + ").add(($T)getParcelerObject(reply.readString(), reply))", genericType.asType());
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
         }
     }
-
-    private boolean isListOfStrings(TypeMirror typeMirror) {
-        return typeMirror.toString().equals("java.util.List<java.lang.String>");
-    }
-
-    private String getParcelableClassName(TypeMirror typeMirror) {
-        if (typeMirror.getKind() != TypeKind.ARRAY) {
-            return typeMirror.toString() + "$$$$Parcelable";
-        } else {
-            return getParcelableClassName(((ArrayType) typeMirror).getComponentType());
-        }
-    }
-
 
 }
