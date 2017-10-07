@@ -10,12 +10,10 @@ import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
@@ -125,8 +123,17 @@ class MethodBuilder extends RemoteBuilder {
         } else {
             methodBuilder.addStatement("mRemote.transact(TRANSACTION_" + methodName + "_" + methodIndex + ", data, reply, 0)");
             //read exception if any
-            methodBuilder.addStatement("reply.readException()");
+            methodBuilder.addStatement("Throwable exception = checkException(reply)");
+            methodBuilder.beginControlFlow("if(exception != null)");
 
+            for (TypeMirror exceptions : executableElement.getThrownTypes()) {
+                ClassName exceptionCName = ClassName.bestGuess(exceptions.toString());
+                methodBuilder.beginControlFlow("if(exception instanceof $T)", exceptionCName);
+                methodBuilder.addStatement("throw ($T)exception", exceptionCName);
+                methodBuilder.endControlFlow();
+            }
+            methodBuilder.addStatement("throw ($T)exception", RuntimeException.class);
+            methodBuilder.endControlFlow();
 
             //read result
             if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
@@ -210,11 +217,18 @@ class MethodBuilder extends RemoteBuilder {
         //end of try
         methodBuilder.endControlFlow();
         //catch rethrow
-        methodBuilder.beginControlFlow("catch ($T re)", Exception.class);
-        methodBuilder.addStatement("throw new $T(re.getMessage())", ClassName.get("android.os", "RemoteException"));
+        methodBuilder.beginControlFlow("catch ($T re)", Throwable.class);
+        methodBuilder.beginControlFlow("if ((flags & FLAG_ONEWAY) == 0)");
+        methodBuilder.addStatement("reply.setDataPosition(0)");
+        methodBuilder.addStatement("reply.writeInt(REMOTER_EXCEPTION_CODE)");
+        methodBuilder.addStatement("reply.writeString(re.getMessage())");
+        methodBuilder.addStatement("reply.writeSerializable(re)");
         methodBuilder.endControlFlow();
-
-
+        methodBuilder.beginControlFlow("else");
+        methodBuilder.addStatement("$T.w(serviceImpl.getClass().getName(), \"Binder call failed.\", re)", ClassName.get("android.util", "Log"));
+        methodBuilder.endControlFlow();
+        methodBuilder.addStatement("return true");
+        methodBuilder.endControlFlow();
         methodBuilder.addStatement("return super.onTransact(code, data, reply, flags)");
         classBuilder.addMethod(methodBuilder.build());
         addCommonExtras(classBuilder);
@@ -365,6 +379,7 @@ class MethodBuilder extends RemoteBuilder {
         addProxyDeathMethod(classBuilder, "linkToDeath", "Register a {@link android.os.IBinder.DeathRecipient} to know of binder connection lose\n");
         addProxyDeathMethod(classBuilder, "unlinkToDeath", "UnRegisters a {@link android.os.IBinder.DeathRecipient}\n");
         addProxyRemoteAlive(classBuilder);
+        addProxyCheckException(classBuilder);
     }
 
     /**
@@ -401,5 +416,29 @@ class MethodBuilder extends RemoteBuilder {
                 .addJavadoc("Checks whether the remote process is alive\n");
         classBuilder.addMethod(methodBuilder.build());
     }
+
+    /**
+     * Add proxy method to check for exception
+     */
+    private void addProxyCheckException(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("checkException")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(Throwable.class)
+                .addParameter(ClassName.get("android.os", "Parcel"), "reply")
+                .addStatement("int code = reply.readInt()")
+                .addStatement("Throwable exception = null")
+                .beginControlFlow("if (code != 0)")
+                .addStatement("String msg = reply.readString()")
+                .beginControlFlow("if (code == REMOTER_EXCEPTION_CODE)")
+                .addStatement("exception = (Throwable) reply.readSerializable()")
+                .endControlFlow()
+                .beginControlFlow("else")
+                .addStatement("exception = new RuntimeException(msg)")
+                .endControlFlow()
+                .endControlFlow()
+                .addStatement("return exception");
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
 
 }

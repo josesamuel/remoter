@@ -361,5 +361,28 @@ public class AIDLClientToRemoterServerTest {
         Assert.assertEquals(1, callBack.size());
     }
 
+    @Test
+    public void testException() {
+        try {
+            sampleService.testException();
+        } catch (Exception exception) {
+            //for aidl clients this should come as runtime
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof RuntimeException);
+        }
+    }
+
+    @Test
+    public void testRuntimeException() {
+        try {
+            sampleService.testRuntimeException();
+        } catch (Exception exception) {
+            //expecting runtime
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof RuntimeException);
+        }
+    }
+
+
 
 }

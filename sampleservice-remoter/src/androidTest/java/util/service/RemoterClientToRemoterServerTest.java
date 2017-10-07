@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import util.remoter.remoterservice.ExtEImpl;
 import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.CustomData;
 import util.remoter.service.CustomData2;
@@ -384,7 +385,7 @@ public class RemoterClientToRemoterServerTest {
         data1.setCustomData2Array(new CustomData2[]{customData2});
 
 
-        CustomData data2 = new ExtCustomData();
+        CustomData data2 = new ExtCustomData(new ExtEImpl());
         data2.setIntData(2);
         data2.setEnumData(TestEnum.ONE);
         CustomData2 customData22 = new CustomData2();
@@ -393,7 +394,7 @@ public class RemoterClientToRemoterServerTest {
         data2.setCustomData2(customData22);
         data2.setCustomData2Array(new CustomData2[]{customData22});
 
-        CustomData data3 = new ExtCustomData();
+        CustomData data3 = new ExtCustomData(new ExtEImpl());
         data3.setIntData(3);
         data3.setEnumData(TestEnum.THREE);
         CustomData2 customData23 = new CustomData2();
@@ -406,6 +407,13 @@ public class RemoterClientToRemoterServerTest {
         CustomData result = sampleService.testParcel(data1, data2, data3);
 
         Assert.assertTrue(result instanceof ExtCustomData);
+        IExtE extE = ((ExtCustomData) result).getRemoteInterface();
+        Assert.assertNotNull(extE);
+        Assert.assertEquals(1, extE.echoInt(1));
+        Assert.assertEquals("ab", extE.echoString("a", "b"));
+        Assert.assertEquals(3, extE.echoLong(1, 2));
+
+
         Assert.assertEquals(3, result.getIntData());
         Assert.assertEquals(TestEnum.THREE, result.getEnumData());
 
@@ -425,7 +433,7 @@ public class RemoterClientToRemoterServerTest {
         data1.setCustomData2Array(new CustomData2[]{customData2});
 
 
-        CustomData data2 = new ExtCustomData();
+        CustomData data2 = new ExtCustomData(new ExtEImpl());
         data2.setIntData(2);
         data2.setEnumData(TestEnum.ONE);
         CustomData2 customData22 = new CustomData2();
@@ -482,7 +490,7 @@ public class RemoterClientToRemoterServerTest {
         data2.setCustomData2(customData22);
         data2.setCustomData2Array(new CustomData2[]{customData22});
 
-        CustomData data3 = new ExtCustomData();
+        CustomData data3 = new ExtCustomData(new ExtEImpl());
         data3.setIntData(3);
         data3.setEnumData(TestEnum.THREE);
         CustomData2 customData23 = new CustomData2();
@@ -535,5 +543,31 @@ public class RemoterClientToRemoterServerTest {
         Assert.assertEquals("ab", extE.echoString("a", "b"));
         Assert.assertEquals(3, extE.echoLong(1, 2));
     }
+
+    @Test
+    public void testException() {
+        try {
+            sampleService.testException();
+        } catch (Exception exception) {
+            //expecting interupted
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof InterruptedException);
+            Assert.assertEquals("Test", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void testRuntimeException() {
+        try {
+            sampleService.testRuntimeException();
+        } catch (Exception exception) {
+            //expecting runtimeexception
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof RuntimeException);
+            Assert.assertEquals("Test", exception.getMessage());
+        }
+    }
+
+
 }
 

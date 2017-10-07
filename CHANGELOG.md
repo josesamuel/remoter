@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.1.2 *(2017-10-7)*
+----------------------------
+
+Clients get the same exception that is thrown by the remote implementation.
+
+
 Version 1.1.0 *(2017-10-4)*
 ----------------------------
 

@@ -364,6 +364,29 @@ public class RemoterClientToAidlServerTest {
         Assert.assertEquals(1, callBack.size());
     }
 
+    @Test
+    public void testException() {
+        try {
+            sampleService.testException();
+        } catch (Exception exception) {
+            //expecting interupted
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof RuntimeException);
+            Assert.assertEquals("Test", exception.getMessage());
+        }
+    }
+
+    @Test
+    public void testRuntimeException() {
+        try {
+            sampleService.testRuntimeException();
+        } catch (Exception exception) {
+            //expecting runtimeexception
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertTrue(exception instanceof RuntimeException);
+            Assert.assertEquals("Test", exception.getMessage());
+        }
+    }
 
 
 }

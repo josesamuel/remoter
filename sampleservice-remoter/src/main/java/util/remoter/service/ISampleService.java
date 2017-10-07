@@ -1,5 +1,6 @@
 package util.remoter.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,11 @@ public interface ISampleService {
 
     @Oneway
     void testOneway1(int a);
+
+    int testException() throws IOException, InterruptedException;
+
+    int testRuntimeException();
+
 
     CustomData testParcel(@ParamIn CustomData customData, @ParamOut CustomData customData2, CustomData customData3);
 

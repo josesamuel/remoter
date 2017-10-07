@@ -26,4 +26,9 @@ interface ISampleService {
     int testOneway0(int a);
     oneway void testOneway1(int a);
 
+    int testException();
+
+    int testRuntimeException();
+
+
 }

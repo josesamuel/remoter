@@ -54,6 +54,10 @@ class FieldBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer("\"" + getRemoterInterfacePackageName() + "." + getRemoterInterfaceClassName() + "\"")
                 .build());
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "REMOTER_EXCEPTION_CODE")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("-99999")
+                .build());
 
     }
 

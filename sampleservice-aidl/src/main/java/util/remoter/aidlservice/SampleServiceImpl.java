@@ -173,4 +173,14 @@ public class SampleServiceImpl extends ISampleService.Stub {
     public void testOneway1(int a) throws RemoteException {
     }
 
+    @Override
+    public int testException() throws RemoteException {
+        throw new RemoteException();
+    }
+
+    @Override
+    public int testRuntimeException() throws RemoteException {
+        throw new RuntimeException("Test");
+    }
+
 }

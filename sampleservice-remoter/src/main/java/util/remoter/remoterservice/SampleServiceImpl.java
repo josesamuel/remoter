@@ -1,5 +1,6 @@
 package util.remoter.remoterservice;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,6 +170,16 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public void testOneway1(int a) {
 
+    }
+
+    @Override
+    public int testException() throws IOException, InterruptedException {
+        throw new InterruptedException("Test");
+    }
+
+    @Override
+    public int testRuntimeException() {
+        throw new RuntimeException("Test");
     }
 
     @Override
