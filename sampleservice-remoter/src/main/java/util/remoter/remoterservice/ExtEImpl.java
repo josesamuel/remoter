@@ -1,5 +1,8 @@
 package util.remoter.remoterservice;
 
+import java.util.List;
+
+import util.remoter.service.CustomData;
 import util.remoter.service.IExtE;
 
 /**
@@ -44,5 +47,9 @@ public class ExtEImpl implements IExtE {
     @Override
     public long echoLong(long s, long s2) {
         return s + s2;
+    }
+
+    @Override
+    public void testListParceler(List<CustomData> customDataList) {
     }
 }

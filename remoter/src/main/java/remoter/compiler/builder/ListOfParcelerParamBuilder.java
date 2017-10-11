@@ -3,6 +3,7 @@ package remoter.compiler.builder;
 import com.squareup.javapoet.MethodSpec;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -97,7 +98,7 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
 
     @Override
     public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        methodBuilder.addStatement("List<$T> " + paramName, genericType.asType());
+        methodBuilder.addStatement("$T<$T> " + paramName, List.class, genericType.asType());
         if (param.asType().getKind() == TypeKind.ARRAY) {
             logError("List[] is not supported");
         } else {
