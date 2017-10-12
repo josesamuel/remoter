@@ -18,6 +18,7 @@ public class CustomData {
     List<CustomData2> customData2List;
     int intData;
     TestEnum enumData;
+    String data;
 
     public CustomData2 getCustomData2() {
         return customData2;
@@ -54,5 +55,13 @@ public class CustomData {
 
     public void setEnumData(TestEnum enumData) {
         this.enumData = enumData;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getData() {
+        return data;
     }
 }

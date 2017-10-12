@@ -66,4 +66,6 @@ public interface ISampleService {
 
     IExtE getExtE();
 
+    ITest<String, CustomData, CustomData> getTemplateRemoter();
+
 }

@@ -30,6 +30,7 @@ import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
 import util.remoter.service.ISampleService_Proxy;
+import util.remoter.service.ITest;
 import util.remoter.service.TestEnum;
 
 import static util.remoter.remoterservice.ServiceIntents.INTENT_AIDL_SERVICE;
@@ -543,6 +544,16 @@ public class RemoterClientToRemoterServerTest {
         Assert.assertEquals("ab", extE.echoString("a", "b"));
         Assert.assertEquals(3, extE.echoLong(1, 2));
     }
+
+    @Test
+    public void testTemplatedRemoter() throws RemoteException {
+        ITest<String, CustomData, CustomData> templateRemoter = sampleService.getTemplateRemoter();
+        Assert.assertNotNull(templateRemoter);
+        CustomData customData = new ExtCustomData2();
+        customData.setData("2");
+        Assert.assertEquals("12", templateRemoter.echo("1", customData).getData());
+    }
+
 
     @Test
     public void testException() {

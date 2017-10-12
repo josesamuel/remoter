@@ -41,6 +41,7 @@ public interface ISampleService {
 * Supports more data types than AIDL, everything supported by Parcel
 * Make an interface that extends other interfaces as @Remoter
 * Interface methods can throw any exceptions. Clients will get the same exception that is thrown.
+* Remoter interface can be templated
 * Remoter is an **annotation processor** that generates two helper classes during build time -- a client side Proxy and a service side Stub that allows you to wrap your interface and implementation
 
 
@@ -82,8 +83,8 @@ Gradle dependency
 ```groovy
 dependencies {
 	//Replace "api" with "compile" for pre AndroidStudio 3
-    api 'com.josesamuel:remoter-annotations:1.1.3'
-    annotationProcessor 'com.josesamuel:remoter:1.1.3'
+    api 'com.josesamuel:remoter-annotations:1.1.4'
+    annotationProcessor 'com.josesamuel:remoter:1.1.4'
 }
 ```
 

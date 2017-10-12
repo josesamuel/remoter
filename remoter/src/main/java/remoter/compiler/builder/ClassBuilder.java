@@ -6,10 +6,13 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 
 /**
  * A {@link RemoteBuilder} that knows how to build the proxy and stub classes.
@@ -32,6 +35,10 @@ class ClassBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(TypeName.get(getRemoterInterfaceElement().asType()));
 
+
+        for (TypeParameterElement typeParameterElement : ((TypeElement) getRemoterInterfaceElement()).getTypeParameters()) {
+            proxyClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+        }
 
         //constructor
         proxyClassBuilder.addMethod(MethodSpec.constructorBuilder()
@@ -61,6 +68,11 @@ class ClassBuilder extends RemoteBuilder {
                 .classBuilder(stubClassName.simpleName())
                 .addModifiers(Modifier.PUBLIC)
                 .superclass(TypeName.get(getBindingManager().getType("android.os.Binder")));
+
+        for (TypeParameterElement typeParameterElement : ((TypeElement) getRemoterInterfaceElement()).getTypeParameters()) {
+            stubClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+        }
+
 
         //constructor
         stubClassBuilder.addMethod(MethodSpec.constructorBuilder()

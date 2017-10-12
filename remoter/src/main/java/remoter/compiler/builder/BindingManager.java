@@ -99,6 +99,10 @@ public final class BindingManager {
      * Returns a {@link Element} for the given class
      */
     Element getElement(String className) {
+        int templateStart = className.indexOf('<');
+        if (templateStart != -1) {
+            className = className.substring(0, templateStart).trim();
+        }
         return elementUtils.getTypeElement(className);
     }
 
@@ -179,7 +183,12 @@ public final class BindingManager {
                     } else if (typeUtils.isAssignable(typeMirror, parcellableTypeMirror)) {
                         paramBuilder = new ParcellableParamBuilder(messager, null);
                     } else {
-                        TypeElement typeElement = elementUtils.getTypeElement(typeMirror.toString());
+                        String typeName = typeMirror.toString();
+                        int templateStart = typeName.indexOf('<');
+                        if (templateStart != -1) {
+                            typeName = typeName.substring(0, templateStart).trim();
+                        }
+                        TypeElement typeElement = elementUtils.getTypeElement(typeName);
                         if (typeElement != null) {
                             if (typeElement.getKind() == ElementKind.INTERFACE && typeElement.getAnnotation(Remoter.class) != null) {
                                 paramBuilder = new BinderParamBuilder(messager, null);

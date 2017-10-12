@@ -11,6 +11,7 @@ import util.remoter.service.FooParcelable;
 import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
+import util.remoter.service.ITest;
 
 public class SampleServiceImpl implements ISampleService {
 
@@ -224,5 +225,10 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public IExtE getExtE() {
         return new ExtEImpl();
+    }
+
+    @Override
+    public ITest<String, CustomData, CustomData> getTemplateRemoter() {
+        return new ITestImpl<String, CustomData, CustomData>();
     }
 }

@@ -335,9 +335,10 @@ class MethodBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PRIVATE)
                 .returns(Class.class)
                 .addParameter(Object.class, "object")
+                .beginControlFlow("if (object != null)")
                 .addStatement("Class objClass = object.getClass()")
                 .addStatement("boolean found = false")
-                .beginControlFlow("while(!found)")
+                .beginControlFlow("while (!found && objClass != null)")
                 .beginControlFlow("try")
                 .addStatement("Class.forName(objClass.getName() + \"$$$$Parcelable\")")
                 .addStatement("found = true")
@@ -346,7 +347,10 @@ class MethodBuilder extends RemoteBuilder {
                 .addStatement("objClass = objClass.getSuperclass()")
                 .endControlFlow()
                 .endControlFlow()
-                .addStatement("return objClass");
+                .addStatement("return objClass")
+                .endControlFlow()
+                .addStatement("return null");
+
         classBuilder.addMethod(methodBuilder.build());
     }
 
