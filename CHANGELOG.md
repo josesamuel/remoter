@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.1.5 *(2018-02-02)*
+----------------------------
+
+All Proxy now implement RemoteProxy interface that exposes methods to listen for binder death
+
+
 Version 1.1.2 *(2017-10-7)*
 ----------------------------
 

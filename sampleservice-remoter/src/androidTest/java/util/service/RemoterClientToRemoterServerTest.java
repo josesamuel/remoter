@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import remoter.RemoterProxy;
 import util.remoter.remoterservice.ExtEImpl;
 import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.CustomData;
@@ -91,6 +92,11 @@ public class RemoterClientToRemoterServerTest {
         mActivityRule.getActivity().unbindService(serviceConnection);
     }
 
+
+    @Test
+    public void testRemoterInstance() {
+        Assert.assertTrue(sampleService instanceof RemoterProxy);
+    }
 
     @Test
     public void testByteParams() throws RemoteException {

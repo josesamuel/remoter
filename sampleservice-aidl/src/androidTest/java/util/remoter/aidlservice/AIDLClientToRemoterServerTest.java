@@ -1,6 +1,7 @@
 package util.remoter.aidlservice;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
@@ -67,8 +68,8 @@ public class AIDLClientToRemoterServerTest {
             Intent remoterServiceIntent = new Intent(ServiceIntents.INTENT_REMOTER_SERVICE);
             remoterServiceIntent.setClassName("util.remoter.remoterservice", ServiceIntents.INTENT_REMOTER_SERVICE);
 
-            mActivityRule.getActivity().startService(remoterServiceIntent);
-            mActivityRule.getActivity().bindService(remoterServiceIntent, serviceConnection, 0);
+            //mActivityRule.getActivity().startService(remoterServiceIntent);
+            mActivityRule.getActivity().bindService(remoterServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
             objectLock.wait();
             Log.i(TAG, "Service connected");
@@ -199,7 +200,6 @@ public class AIDLClientToRemoterServerTest {
 
         Assert.assertEquals("Test", result);
     }
-
 
 
     @Test
@@ -345,7 +345,7 @@ public class AIDLClientToRemoterServerTest {
     }
 
     @Test
-    public void testBinder() throws RemoteException{
+    public void testBinder() throws RemoteException {
         final String message = "Hello";
         final List callBack = new ArrayList();
         ISampleServiceListener listener = new ISampleServiceListener.Stub() {
@@ -382,7 +382,6 @@ public class AIDLClientToRemoterServerTest {
             Assert.assertTrue(exception instanceof RuntimeException);
         }
     }
-
 
 
 }

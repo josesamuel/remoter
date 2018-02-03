@@ -1,6 +1,7 @@
 package util.service;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
@@ -18,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import remoter.RemoterProxy;
+import remoter.RemoterProxyListener;
 import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.ISampleService;
@@ -71,8 +74,8 @@ public class RemoterClientToAidlServerTest {
             Intent remoterServiceIntent = new Intent(INTENT_AIDL_SERVICE);
             remoterServiceIntent.setClassName("util.remoter.aidlservice", INTENT_AIDL_SERVICE);
 
-            mActivityRule.getActivity().startService(remoterServiceIntent);
-            mActivityRule.getActivity().bindService(remoterServiceIntent, serviceConnection, 0);
+            //mActivityRule.getActivity().startService(remoterServiceIntent);
+            mActivityRule.getActivity().bindService(remoterServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
 
             objectLock.wait();
             Log.i(TAG, "Service connected");
@@ -85,6 +88,11 @@ public class RemoterClientToAidlServerTest {
 
 
     @Test
+    public void testRemoterInstance() {
+        Assert.assertTrue(sampleService instanceof RemoterProxy);
+    }
+
+    @Test
     public void testByteParams() throws RemoteException {
         byte a = 1;
         byte[] arrayIn = new byte[]{2, 3};
@@ -92,6 +100,7 @@ public class RemoterClientToAidlServerTest {
         byte[] arrayInOut = new byte[]{6, 7};
 
         byte result = sampleService.testByte(a, arrayIn, arrayOut, arrayInOut);
+
 
         Log.i(TAG, "Byte Result " + result);
 
@@ -348,10 +357,10 @@ public class RemoterClientToAidlServerTest {
     }
 
     @Test
-    public void testBinder() throws RemoteException{
+    public void testBinder() throws RemoteException {
         final String message = "Hello";
         final List callBack = new ArrayList();
-        ISampleServiceListener listener = new ISampleServiceListener(){
+        ISampleServiceListener listener = new ISampleServiceListener() {
             @Override
             public void onEcho(String echo) {
                 Log.i(TAG, "Callback " + echo);

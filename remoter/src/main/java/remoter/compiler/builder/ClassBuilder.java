@@ -14,6 +14,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 
+import remoter.RemoterProxy;
+
 /**
  * A {@link RemoteBuilder} that knows how to build the proxy and stub classes.
  * This uses other builders internally to build the fields and methods.
@@ -33,6 +35,7 @@ class ClassBuilder extends RemoteBuilder {
         TypeSpec.Builder proxyClassBuilder = TypeSpec
                 .classBuilder(proxyClassName.simpleName())
                 .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(ClassName.get(RemoterProxy.class))
                 .addSuperinterface(TypeName.get(getRemoterInterfaceElement().asType()));
 
 
@@ -46,7 +49,9 @@ class ClassBuilder extends RemoteBuilder {
                 .addJavadoc("Initialize this {@link " + getProxyClassName().simpleName() + "} with the given {@link IBinder}\n\n")
                 .addJavadoc("@param binder An {@link IBinder} that exposes a remote {@link " + getRemoterInterfaceClassName() + "}\n")
                 .addParameter(ClassName.get("android.os", "IBinder"), "binder")
-                .addStatement("this.mRemote = binder").build());
+                .addStatement("this.mRemote = binder")
+                .addStatement("linkToDeath(mDeathRecipient)")
+                .build());
 
 
         getBindingManager().getFieldBuilder(getRemoterInterfaceElement()).addProxyFields(proxyClassBuilder);

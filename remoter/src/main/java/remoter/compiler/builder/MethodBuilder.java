@@ -17,6 +17,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
+import remoter.RemoterProxyListener;
 import remoter.annotations.Oneway;
 import remoter.annotations.ParamIn;
 import remoter.annotations.ParamOut;
@@ -380,11 +381,34 @@ class MethodBuilder extends RemoteBuilder {
      * Add other extra methods
      */
     private void addProxyExtras(TypeSpec.Builder classBuilder) {
+        addRemoterProxyMethods(classBuilder);
         addProxyDeathMethod(classBuilder, "linkToDeath", "Register a {@link android.os.IBinder.DeathRecipient} to know of binder connection lose\n");
         addProxyDeathMethod(classBuilder, "unlinkToDeath", "UnRegisters a {@link android.os.IBinder.DeathRecipient}\n");
         addProxyRemoteAlive(classBuilder);
         addProxyCheckException(classBuilder);
     }
+
+    /**
+     * Add proxy method that adds the {@link remoter.RemoterProxy} methods
+     */
+    private void addRemoterProxyMethods(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("registerProxyListener")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.VOID)
+                .addParameter(ClassName.get(RemoterProxyListener.class), "listener")
+                .addStatement("proxyListener = listener")
+                .addAnnotation(Override.class);
+        classBuilder.addMethod(methodBuilder.build());
+
+        methodBuilder = MethodSpec.methodBuilder("unRegisterProxyListener")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(TypeName.VOID)
+                .addParameter(ClassName.get(RemoterProxyListener.class), "listener")
+                .addStatement("proxyListener = null")
+                .addAnnotation(Override.class);
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
 
     /**
      * Add proxy method that exposes the linkToDeath

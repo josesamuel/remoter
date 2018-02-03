@@ -1,6 +1,7 @@
 package remoter.compiler.builder;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -10,6 +11,8 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+
+import remoter.RemoterProxyListener;
 
 /**
  * A {@link RemoteBuilder} that knows how to generate the fields for stub and proxy
@@ -26,6 +29,25 @@ class FieldBuilder extends RemoteBuilder {
         //add IBinder
         classBuilder.addField(FieldSpec.builder(ClassName.get("android.os", "IBinder"), "mRemote")
                 .addModifiers(Modifier.PRIVATE).build());
+
+        classBuilder.addField(FieldSpec.builder(ClassName.get(RemoterProxyListener.class), "proxyListener")
+                .addModifiers(Modifier.PRIVATE).build());
+
+        classBuilder.addField(FieldSpec.builder(ClassName.get("android.os", "IBinder.DeathRecipient"), "mDeathRecipient")
+                .addModifiers(Modifier.PRIVATE)
+                .initializer(CodeBlock.builder()
+                        .beginControlFlow("new IBinder.DeathRecipient() ")
+                        .beginControlFlow("public void binderDied()")
+                        .beginControlFlow("if (proxyListener != null)")
+                        .addStatement("proxyListener.onProxyDead()")
+                        .endControlFlow()
+                        .endControlFlow()
+                        .endControlFlow()
+                        .build()
+                )
+                .build());
+
+
         addCommonFields(classBuilder);
         processRemoterElements(classBuilder, new ElementVisitor() {
             @Override
