@@ -78,7 +78,7 @@ class ParcellableParamBuilder extends ParamBuilder {
             methodBuilder.addStatement("result = reply.createTypedArray(" + getParcelableClassName(resultType) + ".CREATOR)");
         } else {
             methodBuilder.beginControlFlow("if (reply.readInt() != 0)");
-            methodBuilder.addStatement("result = " + getParcelableClassName(resultType) + ".CREATOR.createFromParcel(reply)");
+            methodBuilder.addStatement("result = (" + getParcelableClassName(resultType) + ")" + getParcelableClassName(resultType) + ".CREATOR.createFromParcel(reply)");
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("result = null");
