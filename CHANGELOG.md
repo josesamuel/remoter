@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 1.1.8 *(2018-08-28)*
+----------------------------
+
+Proxy returned of same service instance will have the same identity
+
+
 Version 1.1.5 *(2018-02-02)*
 ----------------------------
 

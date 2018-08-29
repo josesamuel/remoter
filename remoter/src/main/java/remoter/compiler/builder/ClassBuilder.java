@@ -51,6 +51,7 @@ class ClassBuilder extends RemoteBuilder {
                 .addParameter(ClassName.get("android.os", "IBinder"), "binder")
                 .addStatement("this.mRemote = binder")
                 .addStatement("linkToDeath(mDeathRecipient)")
+                .addStatement("this._binderID = __getStubID()")
                 .build());
 
 

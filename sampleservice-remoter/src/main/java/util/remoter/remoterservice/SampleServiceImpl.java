@@ -1,10 +1,13 @@
 package util.remoter.remoterservice;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import util.remoter.service.CustomData;
 import util.remoter.service.FooParcelable;
@@ -14,6 +17,10 @@ import util.remoter.service.ISampleServiceListener;
 import util.remoter.service.ITest;
 
 public class SampleServiceImpl implements ISampleService {
+
+    private static final String TAG = "SampleService";
+
+    private List<ISampleServiceListener> listeners = new CopyOnWriteArrayList<>();
 
     @Override
     public byte testByte(byte a, byte[] arrayIn, byte[] arrayOut, byte[] arrayInOut) {
@@ -230,5 +237,36 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public ITest<String, CustomData, CustomData> getTemplateRemoter() {
         return new ITestImpl<String, CustomData, CustomData>();
+    }
+
+    @Override
+    public int registerListener(ISampleServiceListener listener) {
+        int result = listener.hashCode();
+        if (listeners.contains(listener)) {
+            Log.v(TAG, "Register: Alredy contains listener " + listener.hashCode());
+            result = -1;
+        } else {
+            listeners.add(listener);
+            Log.v(TAG, "Register: added Listener id " + listener.hashCode());
+        }
+
+        for (ISampleServiceListener l : listeners) {
+            l.onEcho("" + listeners.size());
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean unRegisterListener(ISampleServiceListener listener) {
+        boolean result = false;
+        if (listeners.contains(listener)) {
+            Log.v(TAG, "UNRegister: Already contains listener " + listener.hashCode());
+            listeners.remove(listener);
+            result = true;
+        } else {
+            Log.v(TAG, "UNRegister: listener not found" + listener.hashCode());
+        }
+        return result;
     }
 }

@@ -213,6 +213,14 @@ class MethodBuilder extends RemoteBuilder {
         }, methodBuilder);
 
 
+        methodBuilder.beginControlFlow("case TRANSACTION__getStubID:");
+        methodBuilder.addStatement("data.enforceInterface(DESCRIPTOR)");
+        methodBuilder.addStatement("reply.writeNoException()");
+        methodBuilder.addStatement("reply.writeInt(serviceImpl.hashCode())");
+        methodBuilder.addStatement("return true");
+        methodBuilder.endControlFlow();
+
+
         //end switch
         methodBuilder.endControlFlow();
         //end of try
@@ -386,6 +394,9 @@ class MethodBuilder extends RemoteBuilder {
         addProxyDeathMethod(classBuilder, "unlinkToDeath", "UnRegisters a {@link android.os.IBinder.DeathRecipient}\n");
         addProxyRemoteAlive(classBuilder);
         addProxyCheckException(classBuilder);
+        addGetId(classBuilder);
+        addHashCode(classBuilder);
+        addEquals(classBuilder);
     }
 
     /**
@@ -467,6 +478,80 @@ class MethodBuilder extends RemoteBuilder {
                 .addStatement("return exception");
         classBuilder.addMethod(methodBuilder.build());
     }
+
+
+    /**
+     * Add proxy method to set hashcode to uniqueu id of binder
+     */
+    private void addHashCode(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("hashCode")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(int.class)
+                .addAnnotation(Override.class)
+                .addStatement("return _binderID");
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * Add proxy method for equals
+     */
+    private void addEquals(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("equals")
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(Object.class), "obj")
+                .returns(boolean.class)
+                .addAnnotation(Override.class)
+                .addStatement("return (obj instanceof " + getRemoterInterfaceClassName() + ClassBuilder.PROXY_SUFFIX + ") && obj.hashCode() == hashCode()");
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+
+    /**
+     * Add proxy method to get unique id
+     */
+    private void addGetId(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("__getStubID")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(int.class)
+                .addStatement("android.os.Parcel data = android.os.Parcel.obtain()")
+                .addStatement("android.os.Parcel reply = android.os.Parcel.obtain()")
+                .addStatement("int result");
+
+        methodBuilder.beginControlFlow("try");
+
+        //write the descriptor
+        methodBuilder.addStatement("data.writeInterfaceToken(DESCRIPTOR)");
+        methodBuilder.addStatement("mRemote.transact(TRANSACTION__getStubID, data, reply, 0)");
+        //read exception if any
+        methodBuilder.addStatement("Throwable exception = checkException(reply)");
+        methodBuilder.beginControlFlow("if(exception != null)");
+
+        methodBuilder.addStatement("throw ($T)exception", RuntimeException.class);
+        methodBuilder.endControlFlow();
+
+        methodBuilder.addStatement("result = reply.readInt()");
+
+
+        //end of try
+        methodBuilder.endControlFlow();
+
+
+        //catch rethrow
+        methodBuilder.beginControlFlow("catch ($T re)", ClassName.get("android.os", "RemoteException"));
+        methodBuilder.addStatement("throw new $T(re)", RuntimeException.class);
+        methodBuilder.endControlFlow();
+
+
+        //finally block
+        methodBuilder.beginControlFlow("finally");
+        methodBuilder.addStatement("reply.recycle()");
+        methodBuilder.addStatement("data.recycle()");
+        methodBuilder.endControlFlow();
+        methodBuilder.addStatement("return result");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
 
 
 }

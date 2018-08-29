@@ -49,12 +49,22 @@ class FieldBuilder extends RemoteBuilder {
 
 
         addCommonFields(classBuilder);
+        final int[] lastMethodIndex = {0};
         processRemoterElements(classBuilder, new ElementVisitor() {
             @Override
             public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
                 addCommonFields(classBuilder, member, methodIndex);
+                lastMethodIndex[0] = methodIndex;
             }
         }, null);
+
+        lastMethodIndex[0] ++;
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubID")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "_binderID")
+                .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build());
 
     }
 
@@ -62,12 +72,23 @@ class FieldBuilder extends RemoteBuilder {
         classBuilder.addField(FieldSpec.builder(TypeName.get(getRemoterInterfaceElement().asType()), "serviceImpl")
                 .addModifiers(Modifier.PRIVATE).build());
         addCommonFields(classBuilder);
+
+        final int[] lastMethodIndex = {0};
+
         processRemoterElements(classBuilder, new ElementVisitor() {
             @Override
             public void visitElement(TypeSpec.Builder classBuilder, Element member, int methodIndex, MethodSpec.Builder methodBuilder) {
                 addCommonFields(classBuilder, member, methodIndex);
+                lastMethodIndex[0] = methodIndex;
             }
         }, null);
+
+        lastMethodIndex[0] ++;
+
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubID")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
     }
 
     private void addCommonFields(TypeSpec.Builder classBuilder) {

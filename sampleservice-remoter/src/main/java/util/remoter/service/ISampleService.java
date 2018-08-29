@@ -68,4 +68,7 @@ public interface ISampleService {
 
     ITest<String, CustomData, CustomData> getTemplateRemoter();
 
+    int registerListener(ISampleServiceListener listener);
+    boolean unRegisterListener(ISampleServiceListener listener);
+
 }

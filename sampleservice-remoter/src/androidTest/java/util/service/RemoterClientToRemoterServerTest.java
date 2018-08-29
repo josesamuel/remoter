@@ -586,5 +586,68 @@ public class RemoterClientToRemoterServerTest {
     }
 
 
+    @Test
+    public void testProxyIdentity() throws RemoteException {
+
+        final int[] resultCount = {0,0};
+        final String[] expectedEcho = {""};
+
+        ISampleServiceListener listener1 = new ISampleServiceListener() {
+            @Override
+            public void onEcho(String echo) {
+                Log.i(TAG, "Echo from listener 1 " + echo);
+                resultCount[0] ++;
+                Assert.assertEquals(expectedEcho[0], echo);
+            }
+        };
+
+        ISampleServiceListener listener2 = new ISampleServiceListener() {
+            @Override
+            public void onEcho(String echo) {
+                Log.i(TAG, "Echo from listener 2 " + echo);
+                resultCount[1] ++;
+                Assert.assertEquals(expectedEcho[0], echo);
+            }
+        };
+
+
+        expectedEcho[0] = "1";
+
+        int result = sampleService.registerListener(listener1);
+
+        Log.i(TAG, "Listener id " + result);
+
+        Assert.assertEquals(result, listener1.hashCode());
+        Assert.assertEquals(resultCount[0], 1);
+        Assert.assertEquals(resultCount[1], 0);
+
+
+
+        result = sampleService.registerListener(listener1);
+
+        Log.i(TAG, "Listener id same again " + result);
+
+        Assert.assertEquals(result, -1);
+        Assert.assertEquals(resultCount[0], 2);
+        Assert.assertEquals(resultCount[1], 0);
+
+        expectedEcho[0] = "2";
+
+        result = sampleService.registerListener(listener2);
+
+        Log.i(TAG, "Listener id new  " + result);
+
+        Assert.assertEquals(result, listener2.hashCode());
+        Assert.assertEquals(resultCount[0], 3);
+        Assert.assertEquals(resultCount[1], 1);
+
+
+        Assert.assertTrue(sampleService.unRegisterListener(listener1));
+        Assert.assertFalse(sampleService.unRegisterListener(listener1));
+        Assert.assertTrue(sampleService.unRegisterListener(listener2));
+
+    }
+
+
 }
 
