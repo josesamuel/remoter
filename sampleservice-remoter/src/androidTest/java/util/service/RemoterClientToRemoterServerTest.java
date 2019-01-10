@@ -552,6 +552,16 @@ public class RemoterClientToRemoterServerTest {
     }
 
     @Test
+    public void testExtendedRemoterArray() throws RemoteException {
+        IExtE[] array = sampleService.getExtEArray();
+        for (IExtE extE : array) {
+            Assert.assertEquals(1, extE.echoInt(1));
+            Assert.assertEquals("ab", extE.echoString("a", "b"));
+            Assert.assertEquals(3, extE.echoLong(1, 2));
+        }
+    }
+
+    @Test
     public void testTemplatedRemoter() throws RemoteException {
         ITest<String, CustomData, CustomData> templateRemoter = sampleService.getTemplateRemoter();
         Assert.assertNotNull(templateRemoter);

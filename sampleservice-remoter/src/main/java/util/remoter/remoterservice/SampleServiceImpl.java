@@ -235,6 +235,11 @@ public class SampleServiceImpl implements ISampleService {
     }
 
     @Override
+    public IExtE[] getExtEArray() {
+        return new IExtE[]{ new ExtEImpl(), new ExtEImpl()};
+    }
+
+    @Override
     public ITest<String, CustomData, CustomData> getTemplateRemoter() {
         return new ITestImpl<String, CustomData, CustomData>();
     }
