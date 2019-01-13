@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/remoter/remoter.iml" filepath="$PROJECT_DIR$/remoter/remoter.iml" />
       <module fileurl="file://$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" filepath="$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" filepath="$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" />
       <module fileurl="file://$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" filepath="$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" />
       <module fileurl="file://$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" filepath="$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" />
     </modules>

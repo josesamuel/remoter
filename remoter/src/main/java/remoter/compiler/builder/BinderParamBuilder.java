@@ -39,8 +39,20 @@ class BinderParamBuilder extends ParamBuilder {
                     .endControlFlow()
                     .endControlFlow();
         } else {
-            methodBuilder.addStatement("data.writeStrongBinder(" + param.getSimpleName() + " != null ? new $T(" + param.getSimpleName() + ")  : null)",
-                    getStubClassName(param.asType()));
+
+            String binderName = param.getSimpleName() +"_binder";
+            methodBuilder.addStatement("IBinder "+ binderName +" = null");
+            methodBuilder.beginControlFlow("if (" + param.getSimpleName()  + " != null)");
+            methodBuilder.beginControlFlow("synchronized (stubMap)");
+            methodBuilder.addStatement(binderName + " = stubMap.get(" + param.getSimpleName()  +")");
+            methodBuilder.beginControlFlow("if (" + binderName + " == null)");
+            methodBuilder.addStatement(binderName + " = new $T("+ param.getSimpleName() +")", getStubClassName(param.asType()));
+            methodBuilder.addStatement("stubMap.put(" +  param.getSimpleName() + ", " + binderName +")");
+            methodBuilder.endControlFlow();
+            methodBuilder.endControlFlow();
+            methodBuilder.endControlFlow();
+
+            methodBuilder.addStatement("data.writeStrongBinder(" + binderName + ")");
         }
     }
 

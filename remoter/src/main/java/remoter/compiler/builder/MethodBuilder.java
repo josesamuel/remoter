@@ -18,6 +18,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 import remoter.RemoterProxyListener;
+import remoter.RemoterStub;
 import remoter.annotations.Oneway;
 import remoter.annotations.ParamIn;
 import remoter.annotations.ParamOut;
@@ -76,6 +77,8 @@ class MethodBuilder extends RemoteBuilder {
             methodBuilder.addParameter(TypeName.get(params.asType()), params.getSimpleName().toString());
         }
 
+        methodBuilder
+                .addStatement("__checkProxy()");
         //add statements
         methodBuilder
                 .addStatement("android.os.Parcel data = android.os.Parcel.obtain()");
@@ -242,6 +245,8 @@ class MethodBuilder extends RemoteBuilder {
         classBuilder.addMethod(methodBuilder.build());
         addCommonExtras(classBuilder);
 
+        addStubExtras(classBuilder);
+
     }
 
     /**
@@ -386,6 +391,43 @@ class MethodBuilder extends RemoteBuilder {
 
 
     /**
+     * Add other extra methods for stub
+     */
+    private void addStubExtras(TypeSpec.Builder classBuilder) {
+        addSubDestroyMethods(classBuilder);
+    }
+
+
+    /**
+     * Add proxy method that adds the {@link remoter.RemoterProxy} methods
+     */
+    private void addSubDestroyMethods(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("finalize")
+                .addModifiers(Modifier.PROTECTED)
+                .returns(TypeName.VOID)
+                .addException(Throwable.class)
+                .addStatement("super.finalize()")
+                .addAnnotation(Override.class);
+        classBuilder.addMethod(methodBuilder.build());
+
+        methodBuilder = MethodSpec.methodBuilder("destroyStub")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(TypeName.VOID)
+                .beginControlFlow("try")
+                .addStatement("finalize()")
+                .addStatement("this.attachInterface(null, DESCRIPTOR)")
+                .addStatement("binderWrapper.binder = null")
+                .endControlFlow()
+                .beginControlFlow("catch (Throwable t)")
+                .endControlFlow()
+                .addStatement("serviceImpl = null");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+
+    /**
      * Add other extra methods
      */
     private void addProxyExtras(TypeSpec.Builder classBuilder) {
@@ -397,6 +439,54 @@ class MethodBuilder extends RemoteBuilder {
         addGetId(classBuilder);
         addHashCode(classBuilder);
         addEquals(classBuilder);
+        addProxyDestroyMethods(classBuilder);
+    }
+
+
+    /**
+     * Add proxy method for destroystub
+     */
+    private void addProxyDestroyMethods(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("destroyStub")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addParameter(Object.class, "object")
+                .returns(TypeName.VOID)
+                .beginControlFlow("if(object != null)")
+                .beginControlFlow("synchronized (stubMap)")
+                .addStatement("IBinder binder = stubMap.get(object)")
+                .beginControlFlow("if (binder != null)")
+                .addStatement("(($T)binder).destroyStub()", RemoterStub.class)
+                .addStatement("stubMap.remove(object)")
+                .endControlFlow()
+                .endControlFlow()
+                .endControlFlow();
+
+        classBuilder.addMethod(methodBuilder.build());
+
+        methodBuilder = MethodSpec.methodBuilder("__checkProxy")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(TypeName.VOID)
+                .addStatement("if(mRemote == null) throw new RuntimeException(\"Trying to use a destroyed Proxy\")");
+
+        classBuilder.addMethod(methodBuilder.build());
+
+        methodBuilder = MethodSpec.methodBuilder("destroyProxy")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .returns(TypeName.VOID)
+                .addStatement("this.mRemote = null")
+                .addStatement("unRegisterProxyListener(null)")
+                .beginControlFlow("synchronized (stubMap)")
+                .beginControlFlow("for(IBinder binder:stubMap.values())")
+                .addStatement("((RemoterStub)binder).destroyStub()")
+                .endControlFlow()
+                .addStatement("stubMap.clear()")
+                .endControlFlow();
+
+        classBuilder.addMethod(methodBuilder.build());
+
+
     }
 
     /**
@@ -407,7 +497,9 @@ class MethodBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.VOID)
                 .addParameter(ClassName.get(RemoterProxyListener.class), "listener")
-                .addStatement("proxyListener = listener")
+                .addStatement("unRegisterProxyListener(null)")
+                .addStatement("proxyListener = new DeathRecipient(listener)")
+                .addStatement("linkToDeath(proxyListener)")
                 .addAnnotation(Override.class);
         classBuilder.addMethod(methodBuilder.build());
 
@@ -415,6 +507,10 @@ class MethodBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(TypeName.VOID)
                 .addParameter(ClassName.get(RemoterProxyListener.class), "listener")
+                .beginControlFlow("if(proxyListener != null)")
+                .addStatement("unlinkToDeath(proxyListener)")
+                .addStatement("proxyListener.proxyListener = null")
+                .endControlFlow()
                 .addStatement("proxyListener = null")
                 .addAnnotation(Override.class);
         classBuilder.addMethod(methodBuilder.build());
