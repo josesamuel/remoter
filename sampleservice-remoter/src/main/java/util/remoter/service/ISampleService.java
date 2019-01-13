@@ -66,6 +66,8 @@ public interface ISampleService {
 
     IExtE getExtE();
 
+    IExtE[] getExtEArray();
+
     ITest<String, CustomData, CustomData> getTemplateRemoter();
 
     int registerListener(ISampleServiceListener listener);
