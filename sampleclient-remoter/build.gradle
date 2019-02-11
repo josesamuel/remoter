@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+
+    defaultConfig {
+        applicationId "util.remoter.remoterclient"
+        minSdkVersion 9
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    androidTestImplementation deps.junit
+    androidTestImplementation deps.support.test.rules
+
+    api 'com.josesamuel:parceler-api:1.0.0'
+    annotationProcessor 'com.josesamuel:parceler:1.0.0'
+
+//After release
+//    api 'com.josesamuel:remoter-annotations:1.0.1'
+//    annotationProcessor 'com.josesamuel:remoter:1.0.1'
+
+//During development
+    api project(path: ':remoter-annotations')
+    annotationProcessor project(path: ':remoter')
+}

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import remoter.RemoterProxy;
+import remoter.RemoterStub;
 import util.remoter.service.CustomData;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.IExtE;
@@ -268,6 +270,9 @@ public class SampleServiceImpl implements ISampleService {
         if (listeners.contains(listener)) {
             Log.v(TAG, "UNRegister: Already contains listener " + listener.hashCode());
             listeners.remove(listener);
+            if(listener instanceof RemoterProxy){
+                ((RemoterProxy)listener).destroyProxy();
+            }
             result = true;
         } else {
             Log.v(TAG, "UNRegister: listener not found" + listener.hashCode());

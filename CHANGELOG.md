@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 1.1.9 *(2011-01-12)*
+----------------------------
+
+Support for binder[]
+cleanup methods for proxy/stub
+
+
 Version 1.1.8 *(2018-08-28)*
 ----------------------------
 

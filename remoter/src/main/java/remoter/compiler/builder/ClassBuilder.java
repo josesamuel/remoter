@@ -15,6 +15,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 
 import remoter.RemoterProxy;
+import remoter.RemoterProxyListener;
+import remoter.RemoterStub;
 
 /**
  * A {@link RemoteBuilder} that knows how to build the proxy and stub classes.
@@ -43,6 +45,8 @@ class ClassBuilder extends RemoteBuilder {
             proxyClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
         }
 
+        proxyClassBuilder.addType(getDeathRecipientWrapper());
+
         //constructor
         proxyClassBuilder.addMethod(MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
@@ -50,7 +54,6 @@ class ClassBuilder extends RemoteBuilder {
                 .addJavadoc("@param binder An {@link IBinder} that exposes a remote {@link " + getRemoterInterfaceClassName() + "}\n")
                 .addParameter(ClassName.get("android.os", "IBinder"), "binder")
                 .addStatement("this.mRemote = binder")
-                .addStatement("linkToDeath(mDeathRecipient)")
                 .addStatement("this._binderID = __getStubID()")
                 .build());
 
@@ -73,12 +76,14 @@ class ClassBuilder extends RemoteBuilder {
         TypeSpec.Builder stubClassBuilder = TypeSpec
                 .classBuilder(stubClassName.simpleName())
                 .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(ClassName.get(RemoterStub.class))
                 .superclass(TypeName.get(getBindingManager().getType("android.os.Binder")));
 
         for (TypeParameterElement typeParameterElement : ((TypeElement) getRemoterInterfaceElement()).getTypeParameters()) {
             stubClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
         }
 
+        stubClassBuilder.addType(getBinderWrapper());
 
         //constructor
         stubClassBuilder.addMethod(MethodSpec.constructorBuilder()
@@ -87,12 +92,8 @@ class ClassBuilder extends RemoteBuilder {
                 .addJavadoc("@param serviceImpl An implementation of {@link " + getRemoterInterfaceClassName() + "}\n")
                 .addParameter(TypeName.get(getRemoterInterfaceElement().asType()), "serviceImpl")
                 .addStatement("this.serviceImpl = serviceImpl")
-                .beginControlFlow("this.attachInterface(new $T()", ClassName.get("android.os", "IInterface"))
-                .beginControlFlow("public $T asBinder()", ClassName.get("android.os", "IBinder"))
-                .addStatement("return " + stubClassName.simpleName() + ".this")
-                .endControlFlow()
-                .endControlFlow()
-                .addStatement(", DESCRIPTOR)")
+                .addStatement("this.binderWrapper = new BinderWrapper(this)")
+                .addStatement("this.attachInterface(binderWrapper, DESCRIPTOR)")
                 .build());
 
 
@@ -105,6 +106,55 @@ class ClassBuilder extends RemoteBuilder {
         stubClassBuilder.addJavadoc("@see " + getProxyClassName().simpleName() + "\n");
 
         return JavaFile.builder(stubClassName.packageName(), stubClassBuilder.build());
+    }
+
+    /**
+     * Add the static inner Binder wrapper
+     */
+    private TypeSpec getBinderWrapper() {
+        TypeSpec.Builder staticBinderWrapperClassBuilder = TypeSpec
+                .classBuilder("BinderWrapper")
+                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(Modifier.STATIC)
+                .addField(ClassName.get("android.os", "IBinder"), "binder", Modifier.PRIVATE)
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addParameter(ClassName.get("android.os", "IBinder"), "binder")
+                        .addStatement("this.binder = binder")
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("asBinder")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(ClassName.get("android.os", "IBinder"))
+                        .addStatement("return binder")
+                        .build())
+                .addSuperinterface(ClassName.get("android.os", "IInterface"));
+
+        return staticBinderWrapperClassBuilder.build();
+    }
+
+    /**
+     * Add the static inner DeathRecipient wrapper
+     */
+    private TypeSpec getDeathRecipientWrapper() {
+        TypeSpec.Builder staticBinderWrapperClassBuilder = TypeSpec
+                .classBuilder("DeathRecipient")
+                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(Modifier.STATIC)
+                .addField(RemoterProxyListener.class, "proxyListener", Modifier.PRIVATE)
+                .addMethod(MethodSpec.constructorBuilder()
+                        .addParameter(RemoterProxyListener.class, "proxyListener")
+                        .addStatement("this.proxyListener = proxyListener")
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("binderDied")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .beginControlFlow("if (proxyListener != null)")
+                        .addStatement("proxyListener.onProxyDead()")
+                        .endControlFlow()
+                        .build())
+                .addSuperinterface(ClassName.get("android.os", "IBinder.DeathRecipient"));
+
+        return staticBinderWrapperClassBuilder.build();
     }
 
     private ClassName getStubClassName() {

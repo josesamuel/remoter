@@ -23,4 +23,18 @@ public interface RemoterProxy {
      */
     boolean isRemoteAlive();
 
+
+    /**
+     * Destroys any stub created while sending the given object through this proxy.
+     *
+     * @see #destroyProxy()
+     */
+     void destroyStub(Object object);
+
+    /**
+     * Call to destroy the proxy. Proxy should not be used after this. This also clears any stubs
+     * that are send using this proxy
+     */
+    void destroyProxy();
+
 }
