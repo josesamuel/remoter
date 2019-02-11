@@ -1,7 +1,10 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -26,28 +29,26 @@ class BinderParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            TypeMirror type = ((ArrayType) param.asType()).getComponentType();
-            methodBuilder.beginControlFlow("if(" + param.getSimpleName() + " == null)")
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
+            TypeName type = ((ArrayTypeName) param.type).componentType;
+            methodBuilder.beginControlFlow("if($L == null)", param.name)
                     .addStatement("data.writeInt(-1)")
                     .nextControlFlow("else")
-                    .addStatement("data.writeInt(" + param.getSimpleName() + ".length)")
-                    .beginControlFlow("for($T item : " + param.getSimpleName() + ")", type)
-                    .addStatement("data.writeStrongBinder(item != null ? new $T(item)  : null)",
-                            getStubClassName(type))
+                    .addStatement("data.writeInt($L.length)", param.name)
+                    .beginControlFlow("for($T item : $L)", type, param.name)
+                    .addStatement("data.writeStrongBinder(item != null ? new $T(item) : null)", getStubClassName(type))
                     .endControlFlow()
                     .endControlFlow();
         } else {
-            methodBuilder.addStatement("data.writeStrongBinder(" + param.getSimpleName() + " != null ? new $T(" + param.getSimpleName() + ")  : null)",
-                    getStubClassName(param.asType()));
+            methodBuilder.addStatement("data.writeStrongBinder($1L != null ? new $2T($1L) : null)", param.name, getStubClassName(param.type));
         }
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
-            TypeMirror type = ((ArrayType) resultType).getComponentType();
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
+            TypeName type = ((ArrayTypeName) resultType).componentType;
             methodBuilder.beginControlFlow("if(result == null)")
                     .addStatement("data.writeInt(-1)")
                     .nextControlFlow("else")
@@ -66,9 +67,9 @@ class BinderParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
-            TypeMirror type = ((ArrayType) resultType).getComponentType();
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
+            TypeName type = ((ArrayTypeName) resultType).componentType;
             methodBuilder.addStatement("int length = reply.readInt()")
                     .beginControlFlow("if(length == -1)")
                     .addStatement("result = null")
@@ -84,36 +85,36 @@ class BinderParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            TypeMirror type = ((ArrayType) param.asType()).getComponentType();
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
+            TypeName type = ((ArrayTypeName) param.type).componentType;
             methodBuilder.addStatement("int length = data.readInt()")
                     .beginControlFlow("if(length == -1)")
-                    .addStatement(paramName + " = null")
+                    .addStatement("$L = null", param.name)
                     .nextControlFlow("else")
-                    .addStatement(paramName + " = new $T[length]", type)
+                    .addStatement("$L = new $T[length]", param.name, type)
                     .beginControlFlow("for(int i = 0; i < length; i++)")
-                    .addStatement(paramName + "[i] = new $T(reply.readStrongBinder())", getProxyClassName(type))
+                    .addStatement("$L[i] = new $T(reply.readStrongBinder())", param.name, getProxyClassName(type))
                     .endControlFlow()
                     .endControlFlow();
         } else {
-            methodBuilder.addStatement(paramName + " = new $T(data.readStrongBinder())", getProxyClassName(param.asType()));
+            methodBuilder.addStatement("$L = new $T(data.readStrongBinder())", param.name, getProxyClassName(param.type));
         }
     }
 
     @Override
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Returns the {@link ClassName} for the Stub
      */
-    private ClassName getStubClassName(TypeMirror param) {
+    private ClassName getStubClassName(TypeName param) {
         Element element = getBindingManager().getElement(param.toString());
         return ClassName.get(getPackage(element).getQualifiedName().toString(), element.getSimpleName() + ClassBuilder.STUB_SUFFIX);
     }
@@ -121,7 +122,7 @@ class BinderParamBuilder extends ParamBuilder {
     /**
      * Returns the {@link ClassName} for the Proxy
      */
-    private ClassName getProxyClassName(TypeMirror param) {
+    private ClassName getProxyClassName(TypeName param) {
         Element element = getBindingManager().getElement(param.toString());
         return ClassName.get(getPackage(element).getQualifiedName().toString(), element.getSimpleName() + ClassBuilder.PROXY_SUFFIX);
     }

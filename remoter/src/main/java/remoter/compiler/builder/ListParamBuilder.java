@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import java.util.ArrayList;
 
@@ -22,23 +25,23 @@ class ListParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
             logError("List[] is not supported");
         } else {
             if (paramType != ParamType.OUT) {
-                if (isListOfStrings(param.asType())) {
-                    methodBuilder.addStatement("data.writeStringList(" + param.getSimpleName() + ")");
+                if (isListOfStrings(param.type)) {
+                    methodBuilder.addStatement("data.writeStringList($L)", param.name);
                 } else {
-                    methodBuilder.addStatement("data.writeList(" + param.getSimpleName() + ")");
+                    methodBuilder.addStatement("data.writeList($L)", param.name);
                 }
             }
         }
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("List[] is not supported");
         } else {
             if (isListOfStrings(resultType)) {
@@ -50,18 +53,18 @@ class ListParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        if (isListOfStrings(param.asType())) {
-            methodBuilder.addStatement("reply.writeStringList(" + paramName + ")");
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (isListOfStrings(param.type)) {
+            methodBuilder.addStatement("reply.writeStringList($L)", param.name);
         } else {
-            methodBuilder.addStatement("reply.writeList(" + paramName + ")");
+            methodBuilder.addStatement("reply.writeList($L)", param.name);
         }
     }
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("List[] is not supported");
         } else {
             if (isListOfStrings(resultType)) {
@@ -73,35 +76,35 @@ class ListParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
             logError("List[] is not supported");
         } else {
             if (paramType == ParamType.OUT) {
-                methodBuilder.addStatement(paramName + " = new $T()", ArrayList.class);
+                methodBuilder.addStatement("$L = new $T()", param.name, ArrayList.class);
             } else {
-                if (isListOfStrings(param.asType())) {
-                    methodBuilder.addStatement(paramName + " = data.createStringArrayList()");
+                if (isListOfStrings(param.type)) {
+                    methodBuilder.addStatement("$L = data.createStringArrayList()", param.name);
                 } else {
-                    methodBuilder.addStatement(paramName + " = data.readArrayList(getClass().getClassLoader())");
+                    methodBuilder.addStatement("$L = data.readArrayList(getClass().getClassLoader())", param.name);
                 }
             }
         }
     }
 
     @Override
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
-            if (isListOfStrings(param.asType())) {
-                methodBuilder.addStatement("reply.readStringList(" + param.getSimpleName() + ")");
+            if (isListOfStrings(param.type)) {
+                methodBuilder.addStatement("reply.readStringList($L)", param.name);
             } else {
-                methodBuilder.addStatement("reply.readList(" + param.getSimpleName() + ", getClass().getClassLoader())");
+                methodBuilder.addStatement("reply.readList($L, getClass().getClassLoader())", param.name);
             }
         }
     }
 
-    private boolean isListOfStrings(TypeMirror typeMirror) {
+    private boolean isListOfStrings(TypeName typeMirror) {
         return typeMirror.toString().equals("java.util.List<java.lang.String>");
     }
 

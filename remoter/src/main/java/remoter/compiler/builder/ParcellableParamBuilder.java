@@ -1,6 +1,10 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -21,18 +25,18 @@ class ParcellableParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
             if (paramType == ParamType.OUT) {
                 writeArrayOutParamsToProxy(param, methodBuilder);
             } else {
-                methodBuilder.addStatement("data.writeTypedArray(" + param.getSimpleName() + ", 0)");
+                methodBuilder.addStatement("data.writeTypedArray($L, 0)", param.name);
             }
         } else {
             if (paramType != ParamType.OUT) {
-                methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " != null)");
+                methodBuilder.beginControlFlow("if ($L != null)", param.name);
                 methodBuilder.addStatement("data.writeInt(1)");
-                methodBuilder.addStatement(param.getSimpleName() + ".writeToParcel(data, 0)");
+                methodBuilder.addStatement("$L.writeToParcel(data, 0)", param.name);
                 methodBuilder.endControlFlow();
                 methodBuilder.beginControlFlow("else");
                 methodBuilder.addStatement("data.writeInt(0)");
@@ -42,8 +46,8 @@ class ParcellableParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             methodBuilder.addStatement("reply.writeTypedArray(result, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
         } else {
             methodBuilder.beginControlFlow("if (result != null)");
@@ -57,13 +61,13 @@ class ParcellableParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            methodBuilder.addStatement("reply.writeTypedArray(" + paramName + ", android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
+            methodBuilder.addStatement("reply.writeTypedArray($L, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)", param.name);
         } else {
-            methodBuilder.beginControlFlow("if (" + paramName + " != null)");
+            methodBuilder.beginControlFlow("if ($L != null)", param.name);
             methodBuilder.addStatement("reply.writeInt(1)");
-            methodBuilder.addStatement(paramName + ".writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)");
+            methodBuilder.addStatement("$L.writeToParcel(reply, android.os.Parcelable.PARCELABLE_WRITE_RETURN_VALUE)", param.name);
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("reply.writeInt(0)");
@@ -73,12 +77,12 @@ class ParcellableParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
-            methodBuilder.addStatement("result = reply.createTypedArray(" + getParcelableClassName(resultType) + ".CREATOR)");
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
+            methodBuilder.addStatement("result = reply.createTypedArray($T.CREATOR)", getParcelableClassName(resultType));
         } else {
             methodBuilder.beginControlFlow("if (reply.readInt() != 0)");
-            methodBuilder.addStatement("result = (" + getParcelableClassName(resultType) + ")" + getParcelableClassName(resultType) + ".CREATOR.createFromParcel(reply)");
+            methodBuilder.addStatement("result = ($1T)$1T.CREATOR.createFromParcel(reply)", getParcelableClassName(resultType));
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("result = null");
@@ -88,49 +92,49 @@ class ParcellableParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
             if (paramType == ParamType.OUT) {
-                writeOutParamsToStub(param, paramType, paramName, methodBuilder);
+                writeOutParamsToStub(param, paramType, methodBuilder);
             } else {
-                methodBuilder.addStatement(paramName + " = data.createTypedArray(" + getParcelableClassName(param.asType()) + ".CREATOR)");
+                methodBuilder.addStatement("$L = data.createTypedArray($T.CREATOR)", param.name, getParcelableClassName(param.type));
             }
         } else {
             if (paramType == ParamType.OUT) {
-                methodBuilder.addStatement(paramName + " = new " + getParcelableClassName(param.asType()) + "()");
+                methodBuilder.addStatement("$L = new $T()", param.name, getParcelableClassName(param.type));
             } else {
                 methodBuilder.beginControlFlow("if ( data.readInt() != 0)");
-                methodBuilder.addStatement(paramName + " = (" + getParcelableClassName(param.asType()) +")" + getParcelableClassName(param.asType()) + ".CREATOR.createFromParcel(data)");
+                methodBuilder.addStatement("$1L = ($2T)$2T.CREATOR.createFromParcel(data)", param.name, getParcelableClassName(param.type));
                 methodBuilder.endControlFlow();
                 methodBuilder.beginControlFlow("else");
-                methodBuilder.addStatement(paramName + " = null");
+                methodBuilder.addStatement("$L = null", param.name);
                 methodBuilder.endControlFlow();
             }
         }
     }
 
-    private String getParcelableClassName(TypeMirror typeMirror) {
-        if (typeMirror.getKind() != TypeKind.ARRAY) {
-            String pClassName = typeMirror.toString();
+    private ClassName getParcelableClassName(TypeName typeName) {
+        if (!(typeName instanceof ArrayTypeName)) {
+            String pClassName = typeName.toString();
             int genericStartIndex = pClassName.indexOf('<');
             if (genericStartIndex != -1) {
                 pClassName = pClassName.substring(0, genericStartIndex).trim();
             }
-            return pClassName;
+            return ClassName.bestGuess(pClassName);
         } else {
-            return getParcelableClassName(((ArrayType) typeMirror).getComponentType());
+            return getParcelableClassName(((ArrayTypeName) typeName).componentType);
         }
     }
 
     @Override
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
-            if (param.asType().getKind() == TypeKind.ARRAY) {
-                methodBuilder.addStatement("reply.readTypedArray(" + param.getSimpleName() + ", " + getParcelableClassName(param.asType()) + ".CREATOR)");
+            if (param.type instanceof ArrayTypeName) {
+                methodBuilder.addStatement("reply.readTypedArray($L, $T.CREATOR)", param.name, getParcelableClassName(param.type));
             } else {
                 methodBuilder.beginControlFlow("if (reply.readInt() != 0)");
-                methodBuilder.addStatement(param.getSimpleName() + ".readFromParcel(reply)");
+                methodBuilder.addStatement("$L.readFromParcel(reply)", param.name);
                 methodBuilder.endControlFlow();
             }
         }

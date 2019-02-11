@@ -85,6 +85,7 @@ public final class BindingManager {
                     .writeTo(filer);
         } catch (Exception ex) {
             messager.printMessage(Diagnostic.Kind.WARNING, "Error while generating Stub " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 

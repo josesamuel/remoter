@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -20,21 +23,21 @@ class StringParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
             if (paramType == ParamType.OUT) {
                 writeArrayOutParamsToProxy(param, methodBuilder);
             } else {
-                methodBuilder.addStatement("data.writeStringArray(" + param.getSimpleName() + ")");
+                methodBuilder.addStatement("data.writeStringArray($L)", param.name);
             }
         } else {
-            methodBuilder.addStatement("data.writeString(" + param.getSimpleName() + ")");
+            methodBuilder.addStatement("data.writeString($L)", param.name);
         }
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             methodBuilder.addStatement("reply.writeStringArray(result)");
         } else {
             methodBuilder.addStatement("reply.writeString(result)");
@@ -43,8 +46,8 @@ class StringParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             methodBuilder.addStatement("result = reply.createStringArray()");
         } else {
             methodBuilder.addStatement("result = reply.readString()");
@@ -52,30 +55,30 @@ class StringParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            methodBuilder.addStatement("reply.writeStringArray(" + paramName + ")");
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
+            methodBuilder.addStatement("reply.writeStringArray($L)", param.name);
         }
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
             if (paramType == ParamType.OUT) {
-                writeOutParamsToStub(param, paramType, paramName, methodBuilder);
+                writeOutParamsToStub(param, paramType, methodBuilder);
             } else {
-                methodBuilder.addStatement(paramName + " = data.createStringArray()");
+                methodBuilder.addStatement("$L = data.createStringArray()", param.name);
             }
         } else {
-            methodBuilder.addStatement(paramName + " = data.readString()");
+            methodBuilder.addStatement("$L = data.readString()", param.name);
         }
     }
 
     @Override
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY && paramType != ParamType.IN) {
-            methodBuilder.addStatement("reply.readStringArray(" + param.getSimpleName() + ")");
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName && paramType != ParamType.IN) {
+            methodBuilder.addStatement("reply.readStringArray($L)", param.name);
         }
     }
 

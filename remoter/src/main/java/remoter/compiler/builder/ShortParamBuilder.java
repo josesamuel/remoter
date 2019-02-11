@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -19,17 +22,17 @@ class ShortParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            logError("short[] not supported, use int[]" + param.getSimpleName());
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
+            logError("short[] not supported, use int[]" + param.name);
         } else {
-            methodBuilder.addStatement("data.writeInt((int)" + param.getSimpleName() + ")");
+            methodBuilder.addStatement("data.writeInt((int)$L)", param.name);
         }
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("short[] not supported, use int[]");
         } else {
             methodBuilder.addStatement("reply.writeInt(result)");
@@ -37,8 +40,8 @@ class ShortParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("short[] is not supported, use int[]");
             methodBuilder.addStatement("result = null");
         } else {
@@ -48,12 +51,12 @@ class ShortParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
-            logError("short[] not supported, use int[]" + param.getSimpleName());
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
+            logError("short[] not supported, use int[]" + param.name);
         } else {
-            methodBuilder.addStatement(paramName + " = (short)data.readInt()");
+            methodBuilder.addStatement("$L = (short)data.readInt()", param.name);
         }
     }
 

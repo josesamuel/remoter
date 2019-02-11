@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import java.util.HashMap;
 
@@ -22,19 +25,19 @@ class MapParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
             logError("Map[] is not supported");
         } else {
             if (paramType != ParamType.OUT) {
-                methodBuilder.addStatement("data.writeMap(" + param.getSimpleName() + ")");
+                methodBuilder.addStatement("data.writeMap($L)", param.name);
             }
         }
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("Map[] is not supported");
         } else {
             methodBuilder.addStatement("reply.writeMap(result)");
@@ -42,14 +45,14 @@ class MapParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        methodBuilder.addStatement("reply.writeMap(" + paramName + ")");
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        methodBuilder.addStatement("reply.writeMap($L)", param.name);
     }
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("Map[] is not supported");
         } else {
             methodBuilder.addStatement("result = reply.readHashMap(getClass().getClassLoader())");
@@ -57,23 +60,23 @@ class MapParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
             logError("Map[] is not supported");
         } else {
             if (paramType == ParamType.OUT) {
-                methodBuilder.addStatement(paramName + " = new $T()", HashMap.class);
+                methodBuilder.addStatement("$L = new $T()", param.name, HashMap.class);
             } else {
-                methodBuilder.addStatement(paramName + " = data.readHashMap(getClass().getClassLoader())");
+                methodBuilder.addStatement("$L = data.readHashMap(getClass().getClassLoader())", param.name);
             }
         }
     }
 
     @Override
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
-            methodBuilder.addStatement("reply.readMap(" + param.getSimpleName() + ", getClass().getClassLoader())");
+            methodBuilder.addStatement("reply.readMap($L, getClass().getClassLoader())", param.name);
         }
     }
 }

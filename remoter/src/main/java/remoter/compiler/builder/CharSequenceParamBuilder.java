@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -19,13 +22,13 @@ class CharSequenceParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        if (param.type instanceof ArrayTypeName) {
             logError("CharSequence[] cannot be marshalled");
         } else {
-            methodBuilder.beginControlFlow("if(" + param.getSimpleName() + " != null)");
+            methodBuilder.beginControlFlow("if($L != null)", param.name);
             methodBuilder.addStatement("data.writeInt(1)");
-            methodBuilder.addStatement("android.text.TextUtils.writeToParcel(" + param.getSimpleName() + ", data, 0)");
+            methodBuilder.addStatement("android.text.TextUtils.writeToParcel($L, data, 0)", param.name);
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
             methodBuilder.addStatement("data.writeInt(0)");
@@ -34,8 +37,8 @@ class CharSequenceParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("CharSequence[] cannot be marshalled");
         } else {
             methodBuilder.beginControlFlow("if(result!= null)");
@@ -50,8 +53,8 @@ class CharSequenceParamBuilder extends ParamBuilder {
 
 
     @Override
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
-        if (resultType.getKind() == TypeKind.ARRAY) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
+        if (resultType instanceof ArrayTypeName) {
             logError("CharSequence[] cannot be marshalled");
         } else {
             methodBuilder.beginControlFlow("if(reply.readInt() != 0)");
@@ -64,16 +67,16 @@ class CharSequenceParamBuilder extends ParamBuilder {
     }
 
     @Override
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        super.writeParamsToStub(param, paramType, paramName, methodBuilder);
-        if (param.asType().getKind() == TypeKind.ARRAY) {
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        super.writeParamsToStub(param, paramType, methodBuilder);
+        if (param.type instanceof ArrayTypeName) {
             logError("CharSequence[] cannot be marshalled");
         } else {
             methodBuilder.beginControlFlow("if(data.readInt() != 0)");
-            methodBuilder.addStatement(paramName + " = android.text.TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(data)");
+            methodBuilder.addStatement("$L = android.text.TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(data)", param.name);
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
-            methodBuilder.addStatement(paramName + " = null");
+            methodBuilder.addStatement("$L = null", param.name);
             methodBuilder.endControlFlow();
         }
     }

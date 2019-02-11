@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -20,40 +23,39 @@ abstract class ParamBuilder extends RemoteBuilder {
     /**
      * Called to generate code to write the params to proxy
      */
-    public void writeParamsToProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void writeParamsToProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Called to generate code that reads results from proxy
      */
-    public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
+    public void readResultsFromProxy(TypeName resultType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Called to generate code that reads results from proxy for @{@link remoter.annotations.ParamOut} parameters
      */
-    public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+    public void readOutParamsFromProxy(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Called to generate code to write params for stub
      */
-    public void writeParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
-        methodBuilder.addStatement("$T " + paramName, param.asType());
+    public void writeParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
+        methodBuilder.addStatement("$L" , param);
     }
 
     /**
      * Called to generate code to write @{@link remoter.annotations.ParamOut} params for stub
      */
-    public void writeOutParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
+    public void writeOutParamsToStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
-            methodBuilder.addStatement("int " + paramName + "_length = data.readInt()");
-            methodBuilder.beginControlFlow("if (" + paramName + "_length < 0 )");
-            methodBuilder.addStatement(paramName + " = null");
+            methodBuilder.addStatement("int $L_length = data.readInt()", param.name);
+            methodBuilder.beginControlFlow("if ($L_length < 0 )", param.name);
+            methodBuilder.addStatement("$L = null", param.name);
             methodBuilder.endControlFlow();
             methodBuilder.beginControlFlow("else");
-            methodBuilder.addStatement(paramName + " = new " + (((ArrayType) param.asType()).getComponentType().toString())
-                    + "[" + paramName + "_length]");
+            methodBuilder.addStatement("$1L = new $2T[$1L_length]", param.name, ((ArrayTypeName) param.type).componentType);
             methodBuilder.endControlFlow();
         }
     }
@@ -61,24 +63,24 @@ abstract class ParamBuilder extends RemoteBuilder {
     /**
      * Called to generate code that reads results from stub
      */
-    public void readResultsFromStub(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
+    public void readResultsFromStub(TypeName resultType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Called to generate code that reads  {@link remoter.annotations.ParamOut} results from stub
      */
-    public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
+    public void readOutResultsFromStub(ParameterSpec param, ParamType paramType, MethodSpec.Builder methodBuilder) {
     }
 
     /**
      * Called to generate code that writes the out params for array type
      */
-    protected void writeArrayOutParamsToProxy(VariableElement param, MethodSpec.Builder methodBuilder) {
-        methodBuilder.beginControlFlow("if (" + param.getSimpleName() + " == null)");
+    protected void writeArrayOutParamsToProxy(ParameterSpec param, MethodSpec.Builder methodBuilder) {
+        methodBuilder.beginControlFlow("if ($L == null)", param.name);
         methodBuilder.addStatement("data.writeInt(-1)");
         methodBuilder.endControlFlow();
         methodBuilder.beginControlFlow("else");
-        methodBuilder.addStatement("data.writeInt(" + param.getSimpleName() + ".length)");
+        methodBuilder.addStatement("data.writeInt($L.length)", param.name);
         methodBuilder.endControlFlow();
     }
 
