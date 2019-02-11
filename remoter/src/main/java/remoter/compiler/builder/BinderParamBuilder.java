@@ -47,7 +47,7 @@ class BinderParamBuilder extends ParamBuilder {
             methodBuilder.beginControlFlow("synchronized (stubMap)");
             methodBuilder.addStatement("$L = stubMap.get($L)", binderName, param.name);
             methodBuilder.beginControlFlow("if ($L == null)", binderName);
-            methodBuilder.addStatement("$L = new $T($L)", binderName, param.name, getStubClassName(param.type));
+            methodBuilder.addStatement("$L = new $T($L)", binderName, getStubClassName(param.type), param.name);
             methodBuilder.addStatement("stubMap.put($L, $L)", param.name, binderName);
             methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
