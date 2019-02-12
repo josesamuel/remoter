@@ -1,7 +1,12 @@
 Change Log
 ==========
 
-Version 1.1.9 *(2011-01-12)*
+Version 1.2.0 *(2019-02-11)*
+----------------------------
+Prevent name collisions
+
+
+Version 1.1.9 *(2018-01-12)*
 ----------------------------
 
 Support for binder[]

@@ -73,8 +73,10 @@ class MethodBuilder extends RemoteBuilder {
         }
 
         //add parameters
+        int paramIndex = 0;
         for (VariableElement params : executableElement.getParameters()) {
-            methodBuilder.addParameter(TypeName.get(params.asType()), params.getSimpleName().toString());
+            methodBuilder.addParameter(TypeName.get(params.asType()), params.getSimpleName().toString() + "_" + paramIndex);
+            paramIndex++;
         }
 
         methodBuilder
@@ -106,19 +108,22 @@ class MethodBuilder extends RemoteBuilder {
         List<VariableElement> outParams = new ArrayList<>();
 
         //pass parameters
+        paramIndex = 0;
         for (VariableElement param : executableElement.getParameters()) {
             ParamBuilder.ParamType paramType = param.getAnnotation(ParamIn.class) != null ? ParamBuilder.ParamType.IN
                     : param.getAnnotation(ParamOut.class) != null ? ParamBuilder.ParamType.OUT : ParamBuilder.ParamType.IN_OUT;
 
+            VariableElement wrappedParam = new VariableElementWrapper(param, paramIndex);
             if (paramType != ParamBuilder.ParamType.IN) {
-                outParams.add(param);
+                outParams.add(wrappedParam);
             }
             ParamBuilder paramBuilder = getBindingManager().getBuilderForParam(param.asType());
             if (paramBuilder != null) {
-                paramBuilder.writeParamsToProxy(param, paramType, methodBuilder);
+                paramBuilder.writeParamsToProxy(wrappedParam, paramType, methodBuilder);
             } else {
                 logError("Parameter cannot be marshalled " + param.getSimpleName());
             }
+            paramIndex ++;
         }
 
         //send remote command

@@ -83,8 +83,8 @@ Gradle dependency
 ```groovy
 dependencies {
 	//Replace "api" with "compile" for pre AndroidStudio 3
-    api 'com.josesamuel:remoter-annotations:1.1.9'
-    annotationProcessor 'com.josesamuel:remoter:1.1.9'
+    api 'com.josesamuel:remoter-annotations:1.2.0'
+    annotationProcessor 'com.josesamuel:remoter:1.2.0'
 }
 ```
 
