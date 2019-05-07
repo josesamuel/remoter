@@ -9,7 +9,7 @@ import android.os.Parcelable;
 
 public class FooParcelable<T> implements Parcelable {
 
-    public static final Creator<FooParcelable> CREATOR = new Creator<FooParcelable>() {
+    public static final Creator CREATOR = new Creator() {
         @Override
         public FooParcelable createFromParcel(Parcel in) {
             return new FooParcelable(in);

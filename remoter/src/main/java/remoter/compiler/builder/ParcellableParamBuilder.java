@@ -75,7 +75,7 @@ class ParcellableParamBuilder extends ParamBuilder {
     @Override
     public void readResultsFromProxy(TypeMirror resultType, MethodSpec.Builder methodBuilder) {
         if (resultType.getKind() == TypeKind.ARRAY) {
-            methodBuilder.addStatement("result = reply.createTypedArray(" + getParcelableClassName(resultType) + ".CREATOR)");
+            methodBuilder.addStatement("result = ("+ getParcelableClassName(resultType) + "[])reply.createTypedArray(" + getParcelableClassName(resultType) + ".CREATOR)");
         } else {
             methodBuilder.beginControlFlow("if (reply.readInt() != 0)");
             methodBuilder.addStatement("result = (" + getParcelableClassName(resultType) + ")" + getParcelableClassName(resultType) + ".CREATOR.createFromParcel(reply)");
@@ -94,7 +94,7 @@ class ParcellableParamBuilder extends ParamBuilder {
             if (paramType == ParamType.OUT) {
                 writeOutParamsToStub(param, paramType, paramName, methodBuilder);
             } else {
-                methodBuilder.addStatement(paramName + " = data.createTypedArray(" + getParcelableClassName(param.asType()) + ".CREATOR)");
+                methodBuilder.addStatement(paramName + " = ("+ getParcelableClassName(param.asType()) +"[]) data.createTypedArray(" + getParcelableClassName(param.asType()) + ".CREATOR)");
             }
         } else {
             if (paramType == ParamType.OUT) {
