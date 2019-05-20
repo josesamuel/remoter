@@ -206,6 +206,7 @@ class MethodBuilder extends RemoteBuilder {
                 .addParameter(int.class, "flags");
 
         methodBuilder.beginControlFlow("try");
+        methodBuilder.addStatement("onDispatchTransaction(code)");
         methodBuilder.beginControlFlow("switch (code)");
 
         methodBuilder.beginControlFlow("case INTERFACE_TRANSACTION:");
@@ -400,6 +401,7 @@ class MethodBuilder extends RemoteBuilder {
      */
     private void addStubExtras(TypeSpec.Builder classBuilder) {
         addSubDestroyMethods(classBuilder);
+        addSubInterceptMethods(classBuilder);
     }
 
 
@@ -427,6 +429,22 @@ class MethodBuilder extends RemoteBuilder {
                 .beginControlFlow("catch (Throwable t)")
                 .endControlFlow()
                 .addStatement("serviceImpl = null");
+
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+
+    /**
+     * Add stub method that  get called for each transaction from where an exception could be thrown
+     */
+    private void addSubInterceptMethods(TypeSpec.Builder classBuilder) {
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("onDispatchTransaction")
+                .addModifiers(Modifier.PROTECTED)
+                .returns(TypeName.VOID)
+                .addException(Exception.class)
+                .addJavadoc("Override to intercept before binder call for validation\n")
+                .addParameter(int.class, "code");
 
         classBuilder.addMethod(methodBuilder.build());
     }

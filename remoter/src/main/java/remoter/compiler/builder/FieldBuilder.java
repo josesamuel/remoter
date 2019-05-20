@@ -104,7 +104,7 @@ class FieldBuilder extends RemoteBuilder {
     private void addCommonFields(TypeSpec.Builder classBuilder, Element member, int methodIndex) {
         String methodName = member.getSimpleName().toString();
         classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION_" + methodName + "_" + methodIndex)
-                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .addModifiers(Modifier.PROTECTED, Modifier.STATIC, Modifier.FINAL)
                 .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + methodIndex).build());
     }
 }
