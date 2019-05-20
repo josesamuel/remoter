@@ -206,7 +206,6 @@ class MethodBuilder extends RemoteBuilder {
                 .addParameter(int.class, "flags");
 
         methodBuilder.beginControlFlow("try");
-        methodBuilder.addStatement("onDispatchTransaction(code)");
         methodBuilder.beginControlFlow("switch (code)");
 
         methodBuilder.beginControlFlow("case INTERFACE_TRANSACTION:");
@@ -268,6 +267,7 @@ class MethodBuilder extends RemoteBuilder {
         methodBuilder.beginControlFlow("case TRANSACTION_" + methodName + "_" + methodIndex + ":");
 
         methodBuilder.addStatement("data.enforceInterface(DESCRIPTOR)");
+        methodBuilder.addStatement("onDispatchTransaction(code)");
         List<String> paramNames = new ArrayList<>();
         int paramIndex = 0;
         List<VariableElement> outParams = new ArrayList<>();

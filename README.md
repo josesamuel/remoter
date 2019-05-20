@@ -82,8 +82,8 @@ Gradle dependency
 
 ```groovy
 dependencies {
-    implementation 'com.josesamuel:remoter-annotations:1.2.2'
-    annotationProcessor 'com.josesamuel:remoter:1.2.2'
+    implementation 'com.josesamuel:remoter-annotations:1.2.3'
+    annotationProcessor 'com.josesamuel:remoter:1.2.3'
 }
 ```
 
