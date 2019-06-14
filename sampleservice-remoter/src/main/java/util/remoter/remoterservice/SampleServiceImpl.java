@@ -279,4 +279,9 @@ public class SampleServiceImpl implements ISampleService {
         }
         return result;
     }
+
+    @Override
+    public void testOnewayThrowsException(int a){
+        throw new RuntimeException("TestOneWay");
+    }
 }

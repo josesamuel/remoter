@@ -73,4 +73,8 @@ public interface ISampleService {
     int registerListener(ISampleServiceListener listener);
     boolean unRegisterListener(ISampleServiceListener listener);
 
+    @Oneway
+    void testOnewayThrowsException(int a);
+
+
 }

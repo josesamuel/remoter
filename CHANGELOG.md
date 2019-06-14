@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 1.2.4 *(2019-06-14)*
+----------------------------
+Propagate exception from @Oneway 
+
 Version 1.2.0 *(2019-02-11)*
 ----------------------------
 Prevent name collisions

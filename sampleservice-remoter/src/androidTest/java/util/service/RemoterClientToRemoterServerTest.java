@@ -595,6 +595,19 @@ public class RemoterClientToRemoterServerTest {
         }
     }
 
+    @Test
+    public void testRuntimeExceptionForOneWay() {
+        boolean gotException = false;
+        try {
+            sampleService.testOnewayThrowsException(0);
+        } catch (Exception exception) {
+            Log.w(TAG, "Got exception", exception);
+            Assert.assertEquals("TestOneWay", exception.getCause().getMessage());
+            gotException = true;
+        }
+        Assert.assertTrue(gotException);
+    }
+
 
     @Test
     public void testProxyIdentity() throws RemoteException {
