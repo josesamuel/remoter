@@ -240,11 +240,13 @@ class MethodBuilder extends RemoteBuilder {
         methodBuilder.addStatement("reply.writeInt(REMOTER_EXCEPTION_CODE)");
         methodBuilder.addStatement("reply.writeString(re.getMessage())");
         methodBuilder.addStatement("reply.writeSerializable(re)");
+        methodBuilder.addStatement("return true");
         methodBuilder.endControlFlow();
         methodBuilder.beginControlFlow("else");
         methodBuilder.addStatement("$T.w(serviceImpl.getClass().getName(), \"Binder call failed.\", re)", ClassName.get("android.util", "Log"));
+        // throw in case of a oneway call
+        methodBuilder.addStatement("throw re");
         methodBuilder.endControlFlow();
-        methodBuilder.addStatement("return true");
         methodBuilder.endControlFlow();
         methodBuilder.addStatement("return super.onTransact(code, data, reply, flags)");
         classBuilder.addMethod(methodBuilder.build());
