@@ -91,7 +91,12 @@ class BinderParamBuilder extends ParamBuilder {
                     .endControlFlow()
                     .endControlFlow();
         } else {
-            methodBuilder.addStatement("result = new $T(reply.readStrongBinder())", getProxyClassName(resultType));
+            String binderName = "result_binder";
+            methodBuilder.addStatement("IBinder "+ binderName +" = reply.readStrongBinder()");
+            methodBuilder.addStatement("result = null");
+            methodBuilder.beginControlFlow("if("+ binderName +" != null)");
+            methodBuilder.addStatement("result = new $T("+ binderName +")", getProxyClassName(resultType));
+            methodBuilder.endControlFlow();
         }
     }
 
@@ -114,7 +119,12 @@ class BinderParamBuilder extends ParamBuilder {
                     .endControlFlow()
                     .endControlFlow();
         } else {
-            methodBuilder.addStatement(paramName + " = new $T(data.readStrongBinder())", getProxyClassName(param.asType()));
+            String binderName = paramName +"_binder";
+            methodBuilder.addStatement("IBinder "+ binderName +" = data.readStrongBinder()");
+            methodBuilder.addStatement(paramName + " = null");
+            methodBuilder.beginControlFlow("if("+ binderName +" != null)");
+            methodBuilder.addStatement(paramName + " = new $T("+ binderName +")", getProxyClassName(param.asType()));
+            methodBuilder.endControlFlow();
         }
     }
 
