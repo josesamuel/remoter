@@ -169,6 +169,7 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public void testEcho(String string, ISampleServiceListener listener) {
+        Log.v(TAG, "Listener " + listener);
         listener.onEcho(string);
     }
 
@@ -248,9 +249,10 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public int registerListener(ISampleServiceListener listener) {
+        Log.v(TAG, "registerListener " + listener);
         int result = listener.hashCode();
         if (listeners.contains(listener)) {
-            Log.v(TAG, "Register: Alredy contains listener " + listener.hashCode());
+            Log.v(TAG, "Register: Already contains listener " + listener.hashCode());
             result = -1;
         } else {
             listeners.add(listener);
@@ -266,16 +268,17 @@ public class SampleServiceImpl implements ISampleService {
 
     @Override
     public boolean unRegisterListener(ISampleServiceListener listener) {
+        Log.v(TAG, "unRegisterListener " + listener);
         boolean result = false;
         if (listeners.contains(listener)) {
-            Log.v(TAG, "UNRegister: Already contains listener " + listener.hashCode());
+            Log.v(TAG, "UNRegister: Already contains listener " + listener);
             listeners.remove(listener);
             if(listener instanceof RemoterProxy){
                 ((RemoterProxy)listener).destroyProxy();
             }
             result = true;
         } else {
-            Log.v(TAG, "UNRegister: listener not found" + listener.hashCode());
+            Log.v(TAG, "UNRegister: listener not found" + listener);
         }
         return result;
     }

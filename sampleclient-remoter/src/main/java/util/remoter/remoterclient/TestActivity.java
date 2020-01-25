@@ -2,6 +2,7 @@ package util.remoter.remoterclient;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -21,7 +22,7 @@ import static util.remoter.remoterclient.ServiceIntents.INTENT_REMOTER_SERVICE;
  *
  * Perform register/unregister multiple times and run the profiler.
  *
- * Once GS is done on both client and server, the profiler should show only active listeners. Any unregistered
+ * Once GC is done on both client and server, the profiler should show only active listeners. Any unregistered
  * listeners should have been collected
  */
 public class TestActivity extends Activity {
@@ -31,8 +32,9 @@ public class TestActivity extends Activity {
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.v(TAG, "Service connected 1");
             sampleService = new ISampleService_Proxy(service);
-            Log.v(TAG, "Service connected");
+            Log.v(TAG, "Service connected " + sampleService);
         }
 
         @Override
@@ -51,9 +53,10 @@ public class TestActivity extends Activity {
         findViewById(R.id.register).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(TAG, "Register");
+                Log.v(TAG, "Register " + sampleService);
                 if (sampleService != null) {
                     sampleServiceListener = new SampleListener();
+                    Log.v(TAG, "Registering " + sampleServiceListener.hashCode());
                     int result = sampleService.registerListener(sampleServiceListener);
                     Log.v(TAG, "Register result " + result);
                 }
@@ -63,7 +66,7 @@ public class TestActivity extends Activity {
         findViewById(R.id.unregister).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(TAG, "Un Register");
+                Log.v(TAG, "Un Register " + sampleService);
                 if (sampleService != null) {
                     boolean result = sampleService.unRegisterListener(sampleServiceListener);
                     //clear the stub
@@ -76,8 +79,11 @@ public class TestActivity extends Activity {
         Intent remoterServiceIntent = new Intent(INTENT_REMOTER_SERVICE);
         remoterServiceIntent.setClassName("util.remoter.remoterservice", INTENT_REMOTER_SERVICE);
 
+        Log.v(TAG, "Connecting with service");
+
+        boolean result = bindService(remoterServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         //startService(remoterServiceIntent);
-        bindService(remoterServiceIntent, serviceConnection, 0);
+        Log.v(TAG, "Connecting with service  result " + result);
 
     }
 

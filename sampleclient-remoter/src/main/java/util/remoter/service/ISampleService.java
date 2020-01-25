@@ -32,7 +32,7 @@ public interface ISampleService {
 
     int testInt(int a, @ParamIn int[] arrayIn, @ParamOut int[] arrayOut, int[] arrayInOut);
 
-    String testString(String a, @ParamIn String[] arrayIn, @ParamOut String[] arrayOut, String[] arrayInOut);
+    String testString(String a, @ParamIn String[] data, @ParamOut String[] result, String[] reply);
 
     List testList(@ParamIn List inList, @ParamOut List listOut, List inOutList);
 
@@ -66,9 +66,15 @@ public interface ISampleService {
 
     IExtE getExtE();
 
+    IExtE[] getExtEArray();
+
     ITest<String, CustomData, CustomData> getTemplateRemoter();
 
     int registerListener(ISampleServiceListener listener);
     boolean unRegisterListener(ISampleServiceListener listener);
+
+    @Oneway
+    void testOnewayThrowsException(int a);
+
 
 }

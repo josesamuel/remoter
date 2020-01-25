@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 1.2.6 *(2020-01-25)*
+----------------------------
+Proxy equals now match with the id of the stub process it wraps
+Better Proxy toString 
+
 Version 1.2.4 *(2019-06-14)*
 ----------------------------
 Propagate exception from @Oneway 

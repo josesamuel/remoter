@@ -53,6 +53,7 @@ public class RemoterClientToRemoterServerTest {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             sampleService = new ISampleService_Proxy(iBinder);
+            Log.v(TAG, "Got Service " + sampleService);
             synchronized (objectLock) {
                 objectLock.notify();
             }
@@ -546,6 +547,7 @@ public class RemoterClientToRemoterServerTest {
     @Test
     public void testExtendedRemoter() throws RemoteException {
         IExtE extE = sampleService.getExtE();
+        Log.v(TAG, "Got ext Service " + extE);
         Assert.assertEquals(1, extE.echoInt(1));
         Assert.assertEquals("ab", extE.echoString("a", "b"));
         Assert.assertEquals(3, extE.echoLong(1, 2));
@@ -555,6 +557,7 @@ public class RemoterClientToRemoterServerTest {
     public void testExtendedRemoterArray() throws RemoteException {
         IExtE[] array = sampleService.getExtEArray();
         for (IExtE extE : array) {
+            Log.v(TAG, "Got ext Service " + extE);
             Assert.assertEquals(1, extE.echoInt(1));
             Assert.assertEquals("ab", extE.echoString("a", "b"));
             Assert.assertEquals(3, extE.echoLong(1, 2));

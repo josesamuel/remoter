@@ -229,6 +229,14 @@ class MethodBuilder extends RemoteBuilder {
         methodBuilder.endControlFlow();
 
 
+        methodBuilder.beginControlFlow("case TRANSACTION__getStubProcessID:");
+        methodBuilder.addStatement("data.enforceInterface(DESCRIPTOR)");
+        methodBuilder.addStatement("reply.writeNoException()");
+        methodBuilder.addStatement("reply.writeInt(android.os.Process.myPid())");
+        methodBuilder.addStatement("return true");
+        methodBuilder.endControlFlow();
+
+
         //end switch
         methodBuilder.endControlFlow();
         //end of try
@@ -463,6 +471,7 @@ class MethodBuilder extends RemoteBuilder {
         addGetId(classBuilder);
         addHashCode(classBuilder);
         addEquals(classBuilder);
+        addProxyToString(classBuilder);
         addProxyDestroyMethods(classBuilder);
     }
 
@@ -621,7 +630,19 @@ class MethodBuilder extends RemoteBuilder {
                 .addParameter(ClassName.get(Object.class), "obj")
                 .returns(boolean.class)
                 .addAnnotation(Override.class)
-                .addStatement("return (obj instanceof " + getRemoterInterfaceClassName() + ClassBuilder.PROXY_SUFFIX + ") && obj.hashCode() == hashCode()");
+                .addStatement("return (obj instanceof " + getRemoterInterfaceClassName() + ClassBuilder.PROXY_SUFFIX + ") && obj.hashCode() == hashCode() && _stubProcess == ((" + getRemoterInterfaceClassName() + ClassBuilder.PROXY_SUFFIX +")obj)._stubProcess");
+        classBuilder.addMethod(methodBuilder.build());
+    }
+
+    /**
+     * Add proxy method for equals
+     */
+    private void addProxyToString(TypeSpec.Builder classBuilder) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("toString")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(String.class)
+                .addAnnotation(Override.class)
+                .addStatement("return \""+ getRemoterInterfaceClassName() + ClassBuilder.PROXY_SUFFIX  + "[ \"+ _stubProcess + \":\" + _binderID + \"]\"");
         classBuilder.addMethod(methodBuilder.build());
     }
 
@@ -630,7 +651,16 @@ class MethodBuilder extends RemoteBuilder {
      * Add proxy method to get unique id
      */
     private void addGetId(TypeSpec.Builder classBuilder) {
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("__getStubID")
+        addGetIdMethod(classBuilder, "__getStubID", "TRANSACTION__getStubID");
+        addGetIdMethod(classBuilder, "__getStubProcessID", "TRANSACTION__getStubProcessID");
+    }
+
+    /**
+     * Add proxy method to get unique id
+     */
+    private void addGetIdMethod(TypeSpec.Builder classBuilder, String methodName, String descriptorName) {
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName)
                 .addModifiers(Modifier.PRIVATE)
                 .returns(int.class)
                 .addStatement("android.os.Parcel data = android.os.Parcel.obtain()")
@@ -641,7 +671,7 @@ class MethodBuilder extends RemoteBuilder {
 
         //write the descriptor
         methodBuilder.addStatement("data.writeInterfaceToken(DESCRIPTOR)");
-        methodBuilder.addStatement("mRemote.transact(TRANSACTION__getStubID, data, reply, 0)");
+        methodBuilder.addStatement("mRemote.transact(" + descriptorName + ", data, reply, 0)");
         //read exception if any
         methodBuilder.addStatement("Throwable exception = checkException(reply)");
         methodBuilder.beginControlFlow("if(exception != null)");

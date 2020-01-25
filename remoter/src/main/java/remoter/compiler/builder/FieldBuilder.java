@@ -49,7 +49,16 @@ class FieldBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
 
+        lastMethodIndex[0] ++;
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubProcessID")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
+
         classBuilder.addField(FieldSpec.builder(TypeName.INT, "_binderID")
+                .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build());
+
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "_stubProcess")
                 .addModifiers(Modifier.PRIVATE, Modifier.FINAL).build());
 
         classBuilder.addField(FieldSpec.builder(
@@ -82,6 +91,12 @@ class FieldBuilder extends RemoteBuilder {
         classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubID")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
+        lastMethodIndex[0] ++;
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubProcessID")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
 
         classBuilder.addField(FieldSpec.builder(ClassName.bestGuess("BinderWrapper"), "binderWrapper")
                 .addModifiers(Modifier.PRIVATE).build());
