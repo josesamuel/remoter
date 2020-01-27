@@ -3,6 +3,8 @@ package remoter.compiler;
 
 import com.google.auto.service.AutoService;
 
+import net.ltgt.gradle.incap.IncrementalAnnotationProcessor;
+
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -21,6 +23,8 @@ import javax.tools.Diagnostic;
 import remoter.annotations.Remoter;
 import remoter.compiler.builder.BindingManager;
 
+import static net.ltgt.gradle.incap.IncrementalAnnotationProcessorType.ISOLATING;
+
 /**
  * AnnotationProcessor that processes the @{@link Remoter} annotations and
  * generates the Stub and Proxy classes that allows a plain old interface
@@ -29,6 +33,7 @@ import remoter.compiler.builder.BindingManager;
  * @author js
  */
 @AutoService(Processor.class)
+@IncrementalAnnotationProcessor(ISOLATING)
 public class RemoterProcessor extends AbstractProcessor {
 
     private BindingManager bindingManager;

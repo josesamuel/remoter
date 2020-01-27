@@ -29,10 +29,11 @@ dependencies {
     annotationProcessor 'com.josesamuel:parceler:1.0.0'
 
 //After release
-//    api 'com.josesamuel:remoter-annotations:1.0.1'
-//    annotationProcessor 'com.josesamuel:remoter:1.0.1'
+    //api 'com.josesamuel:remoter-annotations:1.2.6'
+    //annotationProcessor 'com.josesamuel:remoter:1.2.6'
 
 //During development
     api project(path: ':remoter-annotations')
     annotationProcessor project(path: ':remoter')
 }
+
