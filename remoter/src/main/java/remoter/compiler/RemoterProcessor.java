@@ -22,6 +22,8 @@ import javax.tools.Diagnostic;
 
 import remoter.annotations.Remoter;
 import remoter.compiler.builder.BindingManager;
+import remoter.compiler.kbuilder.CommonKt;
+import remoter.compiler.kbuilder.KBindingManager;
 
 import static net.ltgt.gradle.incap.IncrementalAnnotationProcessorType.ISOLATING;
 
@@ -37,6 +39,7 @@ import static net.ltgt.gradle.incap.IncrementalAnnotationProcessorType.ISOLATING
 public class RemoterProcessor extends AbstractProcessor {
 
     private BindingManager bindingManager;
+    private KBindingManager kotlinBindingManager;
     private Messager messager;
 
 
@@ -45,7 +48,9 @@ public class RemoterProcessor extends AbstractProcessor {
         super.init(env);
         this.messager = env.getMessager();
         bindingManager = new BindingManager(env.getElementUtils(), env.getFiler(), messager, env.getTypeUtils());
+        kotlinBindingManager = new KBindingManager(env);
     }
+
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -74,8 +79,14 @@ public class RemoterProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         for (Element element : env.getElementsAnnotatedWith(Remoter.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
-                bindingManager.generateProxy(element);
-                bindingManager.generateStub(element);
+                if (CommonKt.hasSuspendFunction(element)){
+                    kotlinBindingManager.generateProxy(element);
+                    kotlinBindingManager.generateStub(element);
+                } else {
+                    bindingManager.generateProxy(element);
+                    bindingManager.generateStub(element);
+                }
+
             } else {
                 messager.printMessage(Diagnostic.Kind.WARNING, "@Remoter is expected only for interface. Ignoring " + element.getSimpleName());
             }

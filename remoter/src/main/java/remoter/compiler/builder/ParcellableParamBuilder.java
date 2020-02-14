@@ -110,6 +110,23 @@ class ParcellableParamBuilder extends ParamBuilder {
         }
     }
 
+
+    /**
+     * Called to generate code to write @{@link remoter.annotations.ParamOut} params for stub
+     */
+    public void writeOutParamsToStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
+        if (paramType != ParamType.IN) {
+            methodBuilder.addStatement("int " + paramName + "_length = data.readInt()");
+            methodBuilder.beginControlFlow("if (" + paramName + "_length < 0 )");
+            methodBuilder.addStatement(paramName + " = null");
+            methodBuilder.endControlFlow();
+            methodBuilder.beginControlFlow("else");
+            methodBuilder.addStatement(paramName + " = new " + getParcelableClassName(param.asType())
+                    + "[" + paramName + "_length]");
+            methodBuilder.endControlFlow();
+        }
+    }
+
     private String getParcelableClassName(TypeMirror typeMirror) {
         if (typeMirror.getKind() != TypeKind.ARRAY) {
             String pClassName = typeMirror.toString();
@@ -127,9 +144,14 @@ class ParcellableParamBuilder extends ParamBuilder {
     public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
             if (param.asType().getKind() == TypeKind.ARRAY) {
+                methodBuilder.beginControlFlow("if(" + param.getSimpleName() +" != null)");
                 methodBuilder.addStatement("reply.readTypedArray(" + param.getSimpleName() + ", " + getParcelableClassName(param.asType()) + ".CREATOR)");
+                methodBuilder.endControlFlow();
             } else {
                 methodBuilder.beginControlFlow("if (reply.readInt() != 0)");
+                methodBuilder.beginControlFlow("if("+ param.getSimpleName() +  " == null)");
+                methodBuilder.addStatement(param.getSimpleName() + " = new " + getParcelableClassName(param.asType()) + "()");
+                methodBuilder.endControlFlow();
                 methodBuilder.addStatement(param.getSimpleName() + ".readFromParcel(reply)");
                 methodBuilder.endControlFlow();
             }

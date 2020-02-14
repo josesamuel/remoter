@@ -1,0 +1,107 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="./index"><span class="identifier">remoter-builder</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="alltypes/index.html"><span class="identifier">alltypes</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/index.html"><span class="keyword">interface </span><span class="identifier">IServiceConnector</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/disconnect.html"><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">disconnect</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/get-service.html"><span class="keyword">abstract</span> <span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getService</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/os/IBinder.html"><span class="identifier">IBinder</span></a></a></a><br/>
+</BODY>
+</HTML>
+</ul>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/index.html"><span class="keyword">class </span><span class="identifier">ServiceConnector</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a><span class="symbol">, </span><span class="identifier">CoroutineScope</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/disconnect.html"><span class="keyword">fun </span><span class="identifier">disconnect</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/disconnect-all.html"><span class="keyword">fun </span><span class="identifier">disconnectAll</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/get-service.html"><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getService</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/os/IBinder.html"><span class="identifier">IBinder</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/of.html"><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, android.content.Intent)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, android.content.Intent)/explicitIntent">explicitIntent</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Intent.html"><span class="identifier">Intent</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/of.html"><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, kotlin.String)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, kotlin.String)/intentAction">intentAction</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a></a></a><br/>
+</BODY>
+</HTML>
+</ul>
+</BODY>
+</HTML>
+</ul>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/index.html"><span class="keyword">package</span>&nbsp;<span class="identifier">remoter.builder</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/index.html"><span class="keyword">interface </span><span class="identifier">IServiceConnector</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/disconnect.html"><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">disconnect</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-i-service-connector/get-service.html"><span class="keyword">abstract</span> <span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getService</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/os/IBinder.html"><span class="identifier">IBinder</span></a></a></a><br/>
+</BODY>
+</HTML>
+</ul>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/index.html"><span class="keyword">class </span><span class="identifier">ServiceConnector</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a><span class="symbol">, </span><span class="identifier">CoroutineScope</span></a></a><br/>
+<ul>
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>Module Contents</title>
+<link rel="stylesheet" href="../style.css">
+</HEAD>
+<BODY>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/disconnect.html"><span class="keyword">fun </span><span class="identifier">disconnect</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/disconnect-all.html"><span class="keyword">fun </span><span class="identifier">disconnectAll</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/get-service.html"><span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getService</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/os/IBinder.html"><span class="identifier">IBinder</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/of.html"><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, android.content.Intent)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, android.content.Intent)/explicitIntent">explicitIntent</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Intent.html"><span class="identifier">Intent</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a></a></a><br/>
+<a href="/Users/jsamuel/Personal/Workspace/Remoter/remoter-builder/build/docs/javadoc/remoter-builder/index"><a href="remoter.builder/-service-connector/of.html"><span class="keyword">fun </span><span class="identifier">of</span><span class="symbol">(</span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, kotlin.String)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="remoter.builder.ServiceConnector.Companion$of(android.content.Context, kotlin.String)/intentAction">intentAction</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html"><span class="identifier">String</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="remoter.builder/-i-service-connector/index.html"><span class="identifier">IServiceConnector</span></a></a></a><br/>
+</BODY>
+</HTML>
+</ul>
+</BODY>
+</HTML>
+</ul>
+</BODY>
+</HTML>
+</ul>
+</BODY>
+</HTML>

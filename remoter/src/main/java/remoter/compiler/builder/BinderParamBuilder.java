@@ -115,7 +115,7 @@ class BinderParamBuilder extends ParamBuilder {
                     .nextControlFlow("else")
                     .addStatement(paramName + " = new $T[length]", type)
                     .beginControlFlow("for(int i = 0; i < length; i++)")
-                    .addStatement(paramName + "[i] = new $T(reply.readStrongBinder())", getProxyClassName(type))
+                    .addStatement(paramName + "[i] = new $T(data.readStrongBinder())", getProxyClassName(type))
                     .endControlFlow()
                     .endControlFlow();
         } else {

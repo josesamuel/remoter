@@ -297,6 +297,7 @@ public class RemoterClientToAidlServerTest {
         Map result = sampleService.testMap(inList, inOutList);
 
         Log.i(TAG, "Map Result " + result);
+        Log.i(TAG, "Out Result " + inOutList);
 
         Assert.assertEquals(3, result.size());
         Assert.assertEquals(100, result.get("Result"));

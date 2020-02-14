@@ -135,14 +135,21 @@ afterEvaluate { project ->
             }
         }
 
-        task androidJavadocs(type: Javadoc) {
-            source = android.sourceSets.main.java.source
-            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//        task androidJavadocs(type: Javadoc) {
+//            source = android.sourceSets.main.java.source
+//            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//        }
+
+        task androidJavadocs(dependsOn: dokka) {
+           // source = android.sourceSets.main.java.source
+           // classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         }
+
 
         task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
             classifier = 'javadoc'
-            from androidJavadocs.destinationDir
+            //from androidJavadocs.destinationDir
+            from dokka.outputDirectory
         }
 
         task androidSourcesJar(type: Jar) {

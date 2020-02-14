@@ -93,11 +93,13 @@ class ListParamBuilder extends ParamBuilder {
     @Override
     public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
+            methodBuilder.beginControlFlow("if (" + param.getSimpleName()  + " != null)");
             if (isListOfStrings(param.asType())) {
                 methodBuilder.addStatement("reply.readStringList(" + param.getSimpleName() + ")");
             } else {
                 methodBuilder.addStatement("reply.readList(" + param.getSimpleName() + ", getClass().getClassLoader())");
             }
+            methodBuilder.endControlFlow();
         }
     }
 

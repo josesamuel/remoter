@@ -73,7 +73,10 @@ class MapParamBuilder extends ParamBuilder {
     @Override
     public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (paramType != ParamType.IN) {
+            methodBuilder.beginControlFlow("if (" + param.getSimpleName() +" != null)");
+            methodBuilder.addStatement(param.getSimpleName() +".clear()");
             methodBuilder.addStatement("reply.readMap(" + param.getSimpleName() + ", getClass().getClassLoader())");
+            methodBuilder.endControlFlow();
         }
     }
 }

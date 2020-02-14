@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 2.0.0 *(2020-02-13)*
+----------------------------
+Kotlin suspend function support!
+
+
 Version 1.2.6 *(2020-01-25)*
 ----------------------------
 Proxy equals now match with the id of the stub process it wraps

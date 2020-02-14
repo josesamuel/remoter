@@ -418,20 +418,20 @@ class MethodBuilder extends RemoteBuilder {
      * Add proxy method that adds the {@link remoter.RemoterProxy} methods
      */
     private void addSubDestroyMethods(TypeSpec.Builder classBuilder) {
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("finalize")
-                .addModifiers(Modifier.PROTECTED)
-                .returns(TypeName.VOID)
-                .addException(Throwable.class)
-                .addStatement("super.finalize()")
-                .addAnnotation(Override.class);
-        classBuilder.addMethod(methodBuilder.build());
+//        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("finalize")
+//                .addModifiers(Modifier.PROTECTED)
+//                .returns(TypeName.VOID)
+//                .addException(Throwable.class)
+//                .addStatement("super.finalize()")
+//                .addAnnotation(Override.class);
+//        classBuilder.addMethod(methodBuilder.build());
 
-        methodBuilder = MethodSpec.methodBuilder("destroyStub")
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("destroyStub")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(TypeName.VOID)
                 .beginControlFlow("try")
-                .addStatement("finalize()")
+                //.addStatement("finalize()")
                 .addStatement("this.attachInterface(null, DESCRIPTOR)")
                 .addStatement("binderWrapper.binder = null")
                 .endControlFlow()

@@ -1,0 +1,51 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>IServiceConnector - remoter-builder</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">remoter-builder</a>&nbsp;/&nbsp;<a href="../index.html">remoter.builder</a>&nbsp;/&nbsp;<a href="./index.html">IServiceConnector</a><br/>
+<br/>
+<h1>IServiceConnector</h1>
+<code><span class="keyword">interface </span><span class="identifier">IServiceConnector</span></code>
+<p>Connects with a service and returns a <a href="https://developer.android.com/reference/android/os/Binder.html">Binder</a> through the suspendable <a href="get-service.html">getService</a> function</p>
+<p><strong>See Also</strong><br/>
+<p><a href="../-service-connector/index.html">ServiceConnector</a></p>
+</p>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="disconnect.html">disconnect</a></h4>
+</td>
+<td>
+<p>Disconnect from the service</p>
+<code><span class="keyword">abstract</span> <span class="keyword">fun </span><span class="identifier">disconnect</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code></td>
+</tr>
+<tr>
+<td>
+<h4><a href="get-service.html">getService</a></h4>
+</td>
+<td>
+<p>Returns the <a href="https://developer.android.com/reference/android/os/IBinder.html">IBinder</a> for the service, by binding to it as needed</p>
+<code><span class="keyword">abstract</span> <span class="keyword">suspend</span> <span class="keyword">fun </span><span class="identifier">getService</span><span class="symbol">(</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/os/IBinder.html"><span class="identifier">IBinder</span></a></code></td>
+</tr>
+</tbody>
+</table>
+<h3>Inheritors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<h4><a href="../-service-connector/index.html">ServiceConnector</a></h4>
+</td>
+<td>
+<p>Implements <a href="./index.html">IServiceConnector</a></p>
+<code><span class="keyword">class </span><span class="identifier">ServiceConnector</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="./index.html"><span class="identifier">IServiceConnector</span></a><span class="symbol">, </span><span class="identifier">CoroutineScope</span></code></td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

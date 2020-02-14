@@ -20,6 +20,13 @@ public class CustomData {
     TestEnum enumData;
     String data;
 
+    public CustomData(){}
+
+    public CustomData(String data, int intData){
+        this.data = data;
+        this.intData = intData;
+    }
+
     public CustomData2 getCustomData2() {
         return customData2;
     }

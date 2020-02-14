@@ -74,7 +74,9 @@ class IntParamBuilder extends ParamBuilder {
     @Override
     public void readOutParamsFromProxy(VariableElement param, ParamType paramType, MethodSpec.Builder methodBuilder) {
         if (param.asType().getKind() == TypeKind.ARRAY && paramType != ParamType.IN) {
+            methodBuilder.beginControlFlow("if (" + param.getSimpleName() +" != null)");
             methodBuilder.addStatement("reply.readIntArray(" + param.getSimpleName() + ")");
+            methodBuilder.endControlFlow();
         }
     }
 

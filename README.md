@@ -38,11 +38,12 @@ public interface ISampleService {
 * No messy **.aidl**, just plain simple **interface**
 * Implement the interface directly using intuitive normal java way, instead of extending Stub
 * **Fully interoperable with AIDL**. Remoter creates the same serialized data as created by AIDL, so it is fully interoperable with AIDL
-* Supports more data types than AIDL, everything supported by Parcel
+* Supports more data types than AIDL, everything supported by [Parceler](https://github.com/johncarl81/parceler)
 * Make an interface that extends other interfaces as @Remoter
 * Interface methods can throw any exceptions. Clients will get the same exception that is thrown.
 * Remoter interface can be templated
 * Remoter is an **annotation processor** that generates two helper classes during build time -- a client side Proxy and a service side Stub that allows you to wrap your interface and implementation
+* **Support kotlin coroutines!**
 
 
 **At the client side**
@@ -72,6 +73,69 @@ That's it!
 * **@ParamIn** Mark an array or Parcelable parameter as an **input only** parameter(**in** of aidl). By **default** they are **input and output** (inout of aidl)
 * **@ParamOut** Mark an array or Parcelable parameter as an **output only** parameter(**out** of aidl).
 * **@Oneway** Annotate on a method (in the @Remoter interface) with void return to make it an asynchronous method. 
+* **@NullableType** Used to annotate a type parameter or suspend function return as nullable. See below for more details
+
+
+
+##Kotlin Support with suspend functions
+
+Remoter supports Kotlin interfaces with suspend functions. If your interface (marked with @Remoter) has any suspend functions, then the generated Proxy and Stub will be in Kotlin, enabling to call your remoter service method from coroutines. 
+
+* The suspend functions will be dispatched using the Dispatcher.IO context
+* Kotlin Proxy can be created using the optional constructor that accepts IServiceConnector which moves service connection to a suspendable coroutine
+
+##### Kotlin Example
+
+* Define interface in kotlin as suspend
+
+```kotlin
+@Remoter
+interface ISampleService {
+
+    /**
+     * A suspend function which will be implemented by a service
+     */
+    suspend fun authenticate(userName:String, password:String) : Boolean
+}
+
+```
+
+* Include the depednecy for RemoterBuilder to take advantage of suspended service connection
+
+```kotlin
+implementation 'com.josesamuel:remoter-builder:<VERSION>'
+```
+
+* From your coroutine, call the remote service call as follows
+
+```kotlin
+
+//From your coroutine context - 
+
+//create service using serviceintent
+val service = ISampleService_Proxy(context, SERVICE_INTENT)
+
+//call the suspend function
+val authenticated = service.authenticate(userName, password)
+
+//The above call will 
+ - suspend the current context
+ - connect to service, 
+ - make the remote call, 
+
+ all sequentially without blocking the calling thread!
+ 
+```
+
+* No need to take care of service connection!
+* No need to move to background thread for service call and then to main thred to update UI!
+
+
+
+##### Notes on Kotlin support
+* vararg is not supported. Either use array or non suspend
+* If any return is nullable type on a suspend function, explicitly mark the method with @NullableType
+* If any types in a generic parameter is nullable, explicitly mnark those parameter with @NullableType optionally specifying which indexex of that type parameter are nullable
 
 
 
@@ -82,10 +146,16 @@ Gradle dependency
 
 ```groovy
 dependencies {
-    implementation 'com.josesamuel:remoter-annotations:1.2.7'
-    annotationProcessor 'com.josesamuel:remoter:1.2.7'
+
+    implementation 'com.josesamuel:remoter-annotations:2.0.0'
+    kapt 'com.josesamuel:remoter:2.0.0'
     
-    //If any of the parameters are @Parcel, include depedencies for @Parcel
+    
+    //If using kotlin coroutines, include following 
+    //to make even the service connection simpler - 
+    
+    implementation 'com.josesamuel:remoter-builder:2.0.0'
+    
 }
 ```
 

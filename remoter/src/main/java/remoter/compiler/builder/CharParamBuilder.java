@@ -54,7 +54,9 @@ class CharParamBuilder extends ParamBuilder {
     @Override
     public void readOutResultsFromStub(VariableElement param, ParamType paramType, String paramName, MethodSpec.Builder methodBuilder) {
         if (param.asType().getKind() == TypeKind.ARRAY) {
+            methodBuilder.beginControlFlow("if (" + paramName +" != null)");
             methodBuilder.addStatement("reply.writeCharArray(" + paramName + ")");
+            methodBuilder.endControlFlow();
         }
     }
 

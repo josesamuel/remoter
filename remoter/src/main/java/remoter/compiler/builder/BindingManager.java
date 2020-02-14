@@ -1,6 +1,9 @@
 package remoter.compiler.builder;
 
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,7 @@ public final class BindingManager {
     private TypeMirror listTypeMirror;
     private TypeMirror mapTypeMirror;
     private TypeMirror parcellableTypeMirror;
+    private TypeName mapTypeName = ClassName.get(Map.class);
     private Class parcelClass;
 
     /**
@@ -138,6 +142,8 @@ public final class BindingManager {
      * Returns the {@link ParamBuilder} that knows how to generate code for the given type of parameter
      */
     ParamBuilder getBuilderForParam(TypeMirror typeMirror) {
+
+        TypeName paramTypeName = TypeName.get(typeMirror);
         ParamBuilder paramBuilder = typeBuilderMap.get(typeMirror);
         if (paramBuilder == null) {
             switch (typeMirror.getKind()) {
@@ -169,6 +175,7 @@ public final class BindingManager {
                     paramBuilder = getBuilderForParam(((ArrayType) typeMirror).getComponentType());
                     break;
                 case DECLARED:
+                    String baseElementName = ((DeclaredType)typeMirror).asElement().getSimpleName().toString();
                     TypeElement genericList = getGenericType(typeMirror);
                     if (genericList != null) {
                         paramBuilder = new ListOfParcelerParamBuilder(messager, null, genericList);
@@ -178,11 +185,12 @@ public final class BindingManager {
                         paramBuilder = new CharSequenceParamBuilder(messager, null);
                     } else if (typeUtils.isAssignable(typeMirror, listTypeMirror) || typeMirror.toString().equals("java.util.List<java.lang.String>")) {
                         paramBuilder = new ListParamBuilder(messager, null);
-                    } else if (typeUtils.isAssignable(typeMirror, mapTypeMirror)) {
+                    } else if (typeUtils.isAssignable(typeMirror, mapTypeMirror) || paramTypeName.equals(mapTypeName) || baseElementName.equals("Map")) {
                         paramBuilder = new MapParamBuilder(messager, null);
                     } else if (typeUtils.isAssignable(typeMirror, parcellableTypeMirror)) {
                         paramBuilder = new ParcellableParamBuilder(messager, null);
                     } else {
+
                         String typeName = typeMirror.toString();
                         int templateStart = typeName.indexOf('<');
                         if (templateStart != -1) {

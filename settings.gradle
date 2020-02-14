@@ -1,4 +1,4 @@
-include  ':remoter-annotations', ':remoter',  ':sampleservice-aidl', ':sampleservice-remoter', ':sampleclient-remoter'
+include  ':remoter-annotations', ':remoter',  ':sampleservice-aidl', ':sampleservice-remoter', ':sampleclient-remoter' , ':remoter-builder'
 
 
 rootProject.name = 'remoter-parent'

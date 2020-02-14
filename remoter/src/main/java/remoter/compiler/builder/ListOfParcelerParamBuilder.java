@@ -87,10 +87,13 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
         if (resultType.getKind() == TypeKind.ARRAY) {
             logError("List[] is not supported");
         } else {
-            methodBuilder.addStatement("result = new $T()", ArrayList.class);
+            methodBuilder.addStatement("result = null");
             methodBuilder.addStatement("int size_result = reply.readInt()");
+            methodBuilder.beginControlFlow("if(size_result >=0)");
+            methodBuilder.addStatement("result = new $T()", ArrayList.class);
             methodBuilder.beginControlFlow("for(int i=0; i<size_result; i++)");
             methodBuilder.addStatement("result.add(($T)getParcelerObject(reply.readString(), reply))", genericType.asType());
+            methodBuilder.endControlFlow();
             methodBuilder.endControlFlow();
         }
     }
@@ -105,11 +108,14 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
             if (paramType == ParamType.OUT) {
                 methodBuilder.addStatement(paramName + " = new $T()", ArrayList.class);
             } else {
-                methodBuilder.addStatement(paramName + " = new $T()", ArrayList.class);
+                methodBuilder.addStatement(paramName + " = null");
                 //read
                 methodBuilder.addStatement("int size_" + paramName + " = data.readInt()");
+                methodBuilder.beginControlFlow("if(size_" + paramName + " >=0 )");
+                methodBuilder.addStatement(paramName + " = new $T()", ArrayList.class);
                 methodBuilder.beginControlFlow("for(int i=0; i<size_" + paramName + "; i++)");
                 methodBuilder.addStatement(paramName + ".add(($T)getParcelerObject(data.readString(), data))", genericType.asType());
+                methodBuilder.endControlFlow();
                 methodBuilder.endControlFlow();
             }
         }
@@ -120,6 +126,10 @@ class ListOfParcelerParamBuilder extends ParamBuilder {
         if (paramType != ParamType.IN) {
             methodBuilder.addStatement("int size_" + param.getSimpleName() + " = reply.readInt()");
             methodBuilder.beginControlFlow("if(size_" + param.getSimpleName() + " >= 0)");
+            methodBuilder.beginControlFlow("if(" + param.getSimpleName() + " == null)");
+            methodBuilder.addStatement(param.getSimpleName() + " = new $T()", ArrayList.class);
+            methodBuilder.endControlFlow();
+
             methodBuilder.addStatement(param.getSimpleName() + ".clear()");
             methodBuilder.beginControlFlow("for(int i=0; i<size_" + param.getSimpleName() + "; i++)");
             methodBuilder.addStatement("((List)" + param.getSimpleName() + ").add(($T)getParcelerObject(reply.readString(), reply))", genericType.asType());
