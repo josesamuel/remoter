@@ -77,12 +77,12 @@ That's it!
 
 
 
-##Kotlin Support with suspend functions
+## Kotlin Support with suspend functions
 
 Remoter supports Kotlin interfaces with suspend functions. If your interface (marked with @Remoter) has any suspend functions, then the generated Proxy and Stub will be in Kotlin, enabling to call your remoter service method from coroutines. 
 
-* The suspend functions will be dispatched using the Dispatcher.IO context
-* Kotlin Proxy can be created using the optional constructor that accepts IServiceConnector which moves service connection to a suspendable coroutine
+* The suspend functions will be dispatched using the [Dispatcher.IO](https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/-dispatchers/-i-o.html) context
+* Kotlin Proxy can be created using the optional constructor that accepts [IServiceConnector](http://josesamuel.com/remoter/javadoc/remoter-builder/remoter-builder/remoter.builder/-i-service-connector/index.html)  which moves service connection to a suspendable coroutine
 
 ##### Kotlin Example
 
@@ -133,9 +133,11 @@ val authenticated = service.authenticate(userName, password)
 
 
 ##### Notes on Kotlin support
+
+* Add remoter-builder dependency to get support for suspendable service connection using [IServiceConnector](http://josesamuel.com/remoter/javadoc/remoter-builder/remoter-builder/remoter.builder/-i-service-connector/index.html) 
 * vararg is not supported. Either use array or non suspend
-* If any return is nullable type on a suspend function, explicitly mark the method with @NullableType
-* If any types in a generic parameter is nullable, explicitly mnark those parameter with @NullableType optionally specifying which indexex of that type parameter are nullable
+* If any return is nullable type on a suspend function, explicitly mark the method with @[NullableType](https://josesamuel.com/remoter/javadoc/remoter/annotations/NullableType.html)
+* If any types in a generic parameter is nullable, explicitly mnark those parameter with @[NullableType](https://josesamuel.com/remoter/javadoc/remoter/annotations/NullableType.html) optionally specifying which indexex of that type parameter are nullable
 
 
 
