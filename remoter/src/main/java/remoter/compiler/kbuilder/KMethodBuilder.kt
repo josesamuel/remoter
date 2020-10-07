@@ -4,12 +4,12 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.jvm.throws
 import kotlinx.coroutines.Dispatchers
+import remoter.RemoterGlobalProperties
 import remoter.RemoterProxyListener
 import remoter.RemoterStub
 import remoter.annotations.Oneway
 import remoter.annotations.ParamIn
 import remoter.annotations.ParamOut
-
 import remoter.compiler.kbuilder.KClassBuilder.Companion.PROXY_SUFFIX
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
@@ -190,6 +190,7 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
         }
         methodCall += ")"
 
+        methodBuilder.addStatement("%T.set(${ParamBuilder.DATA}.readHashMap(javaClass.getClassLoader()))", RemoterGlobalProperties::class.java)
 
         if (isSuspendFunction) {
             if (!isSuspendUnit) {
@@ -205,7 +206,7 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 methodBuilder.addStatement(methodCall)
             }
         }
-
+        methodBuilder.addStatement("RemoterGlobalProperties.reset()")
 
         if (!isOneWay) {
             methodBuilder.beginControlFlow("if (${ParamBuilder.REPLY} != null)")
@@ -375,6 +376,8 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 remoterCall = "_getRemoteServiceBinderSuspended().transact"
             }
         }
+
+        methodBuilder.addStatement("${ParamBuilder.DATA}.writeMap(__global_properties as %T<*, *>?)", MAP);
 
         //send remote command
         if (isOneWay) {
@@ -566,6 +569,17 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 .endControlFlow()
                 .addStatement("stubMap.clear()")
                 .endControlFlow()
+        classBuilder.addFunction(methodBuilder.build())
+
+
+        methodBuilder = FunSpec.builder("setRemoterGlobalProperties")
+                .addModifiers(KModifier.PUBLIC)
+                .addModifiers(KModifier.OVERRIDE)
+                .addParameter("properties", ClassName("kotlin.collections", "MutableMap").parameterizedBy(
+                        String::class.asTypeName(),
+                        Any::class.asTypeName()).copy(true))
+                .returns(Unit::class)
+                .addStatement("this.__global_properties = properties")
         classBuilder.addFunction(methodBuilder.build())
     }
 

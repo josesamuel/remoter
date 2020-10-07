@@ -96,6 +96,7 @@ class BinderParamBuilder extends ParamBuilder {
             methodBuilder.addStatement("result = null");
             methodBuilder.beginControlFlow("if("+ binderName +" != null)");
             methodBuilder.addStatement("result = new $T("+ binderName +")", getProxyClassName(resultType));
+            methodBuilder.addStatement("(($T)result).setRemoterGlobalProperties(__global_properties)", getProxyClassName(resultType));
             methodBuilder.endControlFlow();
         }
     }

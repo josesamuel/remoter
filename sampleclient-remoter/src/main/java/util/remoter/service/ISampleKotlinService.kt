@@ -3,16 +3,6 @@ package util.remoter.service
 import remoter.annotations.*
 import java.io.IOException
 
-
-@Remoter
-interface ISampleService {
-
-    /**
-     * A suspend function
-     */
-    suspend fun authenticate(userName:String, password:String) : Boolean
-}
-
 @Remoter
 interface ISampleKotlinService {
 
@@ -182,5 +172,9 @@ interface ISampleKotlinService {
     fun getNonSuspendInterface() : ISampleNonSuspendKotlinService
 
     fun getNonSuspendInterface2() : ISampleNonSuspendKotlinService2
+
+    fun getExtE() : IExtE
+
+    suspend fun getExtESuspend() : IExtE
 
 }

@@ -118,6 +118,7 @@ internal class BinderParamBuilder(remoterInterfaceElement: Element, bindingManag
             }
             methodBuilder.beginControlFlow("if($binderName != null)")
             methodBuilder.addStatement("$RESULT = %T($binderName)", getProxyClassName(resultMirror))
+            methodBuilder.addStatement("$RESULT.setRemoterGlobalProperties(__global_properties)")
             methodBuilder.endControlFlow()
             methodBuilder.beginControlFlow("else")
             if (!resultType.isNullable) {

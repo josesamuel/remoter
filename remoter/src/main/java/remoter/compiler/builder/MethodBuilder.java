@@ -2,11 +2,13 @@ package remoter.compiler.builder;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
@@ -17,6 +19,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
+import remoter.RemoterGlobalProperties;
 import remoter.RemoterProxyListener;
 import remoter.RemoterStub;
 import remoter.annotations.Oneway;
@@ -125,6 +128,8 @@ class MethodBuilder extends RemoteBuilder {
             }
             paramIndex ++;
         }
+
+        methodBuilder.addStatement("data.writeMap(__global_properties)");
 
         //send remote command
         if (isOneWay) {
@@ -312,11 +317,14 @@ class MethodBuilder extends RemoteBuilder {
         }
         methodCall += ")";
 
+        methodBuilder.addStatement("$T.set(data.readHashMap(getClass().getClassLoader()))", RemoterGlobalProperties.class);
+
         if (executableElement.getReturnType().getKind() != TypeKind.VOID) {
             methodBuilder.addStatement("$T result = " + methodCall, executableElement.getReturnType());
         } else {
             methodBuilder.addStatement(methodCall);
         }
+        methodBuilder.addStatement("RemoterGlobalProperties.reset()");
 
         if (!isOneWay) {
             methodBuilder.addStatement("reply.writeNoException()");
@@ -516,6 +524,18 @@ class MethodBuilder extends RemoteBuilder {
                 .endControlFlow()
                 .addStatement("stubMap.clear()")
                 .endControlFlow();
+
+        classBuilder.addMethod(methodBuilder.build());
+
+
+        methodBuilder = MethodSpec.methodBuilder("setRemoterGlobalProperties")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class),
+                        ClassName.get(String.class),
+                        ClassName.get(Object.class)), "properties")
+                .returns(TypeName.VOID)
+                .addStatement("this.__global_properties = properties");
 
         classBuilder.addMethod(methodBuilder.build());
 

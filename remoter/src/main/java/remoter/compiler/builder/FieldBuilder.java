@@ -69,6 +69,13 @@ class FieldBuilder extends RemoteBuilder {
                 .initializer("new $T()", WeakHashMap.class)
                 .build());
 
+        classBuilder.addField(FieldSpec.builder(
+                ParameterizedTypeName.get(ClassName.get(Map.class),
+                        ClassName.get(String.class),
+                        ClassName.get(Object.class)), "__global_properties")
+                .addModifiers(Modifier.PRIVATE)
+                .build());
+
     }
 
     public void addStubFields(TypeSpec.Builder classBuilder) {

@@ -82,6 +82,16 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                 .initializer("%T()", WeakHashMap::class)
                 .build())
 
+        classBuilder.addProperty(PropertySpec.builder("__global_properties", ClassName("kotlin.collections", "MutableMap").parameterizedBy(
+                String::class.asTypeName(),
+                Any::class.asTypeName())
+                .copy(nullable = true),
+                KModifier.PRIVATE)
+                .mutable()
+                .initializer("null")
+                .build())
+
+
     }
 
     fun addStubFields(classBuilder: TypeSpec.Builder) {

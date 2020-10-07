@@ -551,7 +551,25 @@ public class RemoterClientToRemoterServerTest {
         Assert.assertEquals(1, extE.echoInt(1));
         Assert.assertEquals("ab", extE.echoString("a", "b"));
         Assert.assertEquals(3, extE.echoLong(1, 2));
+        Assert.assertNull(extE.echoString("GlobalKey1", "b"));
     }
+
+
+    @Test
+    public void testGlobalProperties() throws RemoteException {
+        Map<String, Object> globalProperties = new HashMap<String, Object>();
+        globalProperties.put("GlobalKey1", "Value1");
+        ((ISampleService_Proxy)sampleService).setRemoterGlobalProperties(globalProperties);
+
+
+        IExtE extE = sampleService.getExtE();
+        Log.v(TAG, "Got ext Service " + extE);
+        Assert.assertEquals(1, extE.echoInt(1));
+        Assert.assertEquals("ab", extE.echoString("a", "b"));
+        Assert.assertEquals(3, extE.echoLong(1, 2));
+        Assert.assertEquals("Value1", extE.echoString("GlobalKey1", "b"));
+    }
+
 
     @Test
     public void testExtendedRemoterArray() throws RemoteException {

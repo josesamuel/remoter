@@ -12,6 +12,7 @@ import util.remoter.service.*
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
+
 private const val SERVICE_INTENT = "util.remoter.remoterclient.SampleKotlinService"
 
 class TestKotlinSuspendService {
@@ -85,6 +86,38 @@ class TestKotlinSuspendService {
             Assert.assertEquals(2.toByte(), output[0])
             Assert.assertEquals(2.toByte(), inputOutput[0])
 
+        }
+    }
+
+    @Test
+    fun testGlobalPropertiesNotSet() {
+        val extE: IExtE = service.getExtE()
+        Assert.assertEquals("ab", extE.echoString("a", "b"))
+        Assert.assertNull(extE.echoString("GlobalKey1", "b"))
+    }
+
+
+    @Test
+    fun testGlobalProperties() {
+        val globalProperties: MutableMap<String, Any> = HashMap()
+        globalProperties["GlobalKey1"] = "Value1"
+        (service as ISampleKotlinService_Proxy).setRemoterGlobalProperties(globalProperties)
+
+        val extE: IExtE = service.getExtE()
+        Assert.assertEquals("ab", extE.echoString("a", "b"))
+        Assert.assertEquals("Value1", extE.echoString("GlobalKey1", "b"))
+    }
+
+    @Test
+    fun testGlobalPropertiesSuspend() {
+        runBlocking {
+            val globalProperties: MutableMap<String, Any> = HashMap()
+            globalProperties["GlobalKey1"] = "Value1"
+            (service as ISampleKotlinService_Proxy).setRemoterGlobalProperties(globalProperties)
+
+            val extE: IExtE = service.getExtESuspend()
+            Assert.assertEquals("ab", extE.echoString("a", "b"))
+            Assert.assertEquals("Value1", extE.echoString("GlobalKey1", "b"))
         }
     }
 
@@ -538,7 +571,7 @@ class TestKotlinSuspendService {
             Assert.assertEquals("Hello", result)
 
             val lock = CountDownLatch(1)
-            result = service.testEcho("Hello", object : ISampleKotlinServiceListener{
+            result = service.testEcho("Hello", object : ISampleKotlinServiceListener {
                 override suspend fun onEcho(echo: String?) {
                     Assert.assertEquals("Hello", result)
                     lock.countDown()

@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import remoter.RemoterGlobalProperties
 import util.remoter.service.*
 import java.io.IOException
 
@@ -421,6 +422,60 @@ class KotlinServiceImpl : ISampleKotlinService {
 
     override fun getNonSuspendInterface2(): ISampleNonSuspendKotlinService2 {
         return nonSuspendService2
+    }
+
+    override fun getExtE(): IExtE {
+        return ExtImpl()
+    }
+
+    override suspend fun getExtESuspend(): IExtE {
+        return ExtImpl()
+    }
+
+}
+
+class ExtImpl : IExtE {
+    override fun echoString(s: String?): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoString(s: String?, s2: String?): String? {
+        if ("GlobalKey1" == s) {
+            //return from global properties for test
+            val result = RemoterGlobalProperties.get(s) as String?
+            Log.w("EXT", "Global properties $result")
+            return result
+        }
+
+        return s + s2
+    }
+
+    override fun echoInt(s: Int): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoInt(s: Int, s2: Int): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoFloat(s: Float): Float {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoFloat(s: Float, s2: Float): Float {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoLong(s: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun echoLong(s: Long, s2: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override fun testListParceler(customDataList: MutableList<CustomData>?) {
+        TODO("Not yet implemented")
     }
 
 }

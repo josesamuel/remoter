@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/remoter/remoter.iml" filepath="$PROJECT_DIR$/remoter/remoter.iml" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" filepath="$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-builder/remoter-builder.iml" filepath="$PROJECT_DIR$/remoter-builder/remoter-builder.iml" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" filepath="$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" filepath="$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" filepath="$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/remoter/remoter.iml" filepath="$PROJECT_DIR$/remoter/remoter.iml" group="remoter-parent/remoter" />
+      <module fileurl="file://$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" filepath="$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" group="remoter-parent/remoter-annotations" />
+      <module fileurl="file://$PROJECT_DIR$/remoter-builder/remoter-builder.iml" filepath="$PROJECT_DIR$/remoter-builder/remoter-builder.iml" group="remoter-parent/remoter-builder" />
+      <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" group="remoter-parent" />
+      <module fileurl="file://$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" filepath="$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" group="remoter-parent/sampleclient-remoter" />
+      <module fileurl="file://$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" filepath="$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" group="remoter-parent/sampleservice-aidl" />
+      <module fileurl="file://$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" filepath="$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" group="remoter-parent/sampleservice-remoter" />
     </modules>
   </component>
 </project>

@@ -1,5 +1,7 @@
 package remoter;
 
+import java.util.Map;
+
 /**
  * Represents a remote proxy. This will be implemented by the Remoter generated Proxy classes.
  */
@@ -37,4 +39,9 @@ public interface RemoterProxy {
      */
     void destroyProxy();
 
+    /**
+     * Set any global properties to be send with all remote calls.
+     * At the service side this can be obtained using {@link RemoterGlobalProperties#get(String)}
+     */
+    void setRemoterGlobalProperties(Map<String, Object> properties);
 }
