@@ -76,5 +76,9 @@ public interface ISampleService {
     @Oneway
     void testOnewayThrowsException(int a);
 
+    IServiceInterfaceWithLesserMethods getTestInterfaceWithLesserServerMethods();
+
+    IServiceInterfaceWithMoreMethods getTestInterfaceWithMoreServerMethods();
+
 
 }

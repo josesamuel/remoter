@@ -104,6 +104,13 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                 .addModifiers(KModifier.PRIVATE).build())
 
 
+        classBuilder.addProperty(PropertySpec.builder("__lastMethodIndexOfProxy", Int::class)
+                .addModifiers(KModifier.PRIVATE)
+                .initializer("-1")
+                .mutable()
+                .build())
+
+
         val lastMethodIndex = intArrayOf(0)
 
         processRemoterElements(companion, object : ElementVisitor {
@@ -113,6 +120,19 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
             }
         }, null)
 
+
+
+        companion.addProperty(PropertySpec.builder("__lastMethodIndex", Int::class)
+                .addModifiers(KModifier.PRIVATE)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0])
+                .build())
+
+        companion.addProperty(PropertySpec.builder("checkStubProxyMatch", Boolean::class)
+                .addModifiers(KModifier.PUBLIC)
+                .addKdoc("Enable or disable stub proxy mismatch check. Default enabled. Turn it off if using Remoter client with AIDL server")
+                .mutable()
+                .initializer("true")
+                .build())
 
 
         lastMethodIndex[0]++

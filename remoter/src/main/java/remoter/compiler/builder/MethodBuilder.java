@@ -211,7 +211,7 @@ class MethodBuilder extends RemoteBuilder {
                 .addParameter(int.class, "flags");
 
         methodBuilder.beginControlFlow("try");
-        methodBuilder.beginControlFlow("switch (code)");
+        methodBuilder.beginControlFlow("switch (mapTransactionCode(code))");
 
         methodBuilder.beginControlFlow("case INTERFACE_TRANSACTION:");
         methodBuilder.addStatement("reply.writeString(DESCRIPTOR)");
@@ -419,6 +419,7 @@ class MethodBuilder extends RemoteBuilder {
     private void addStubExtras(TypeSpec.Builder classBuilder) {
         addSubDestroyMethods(classBuilder);
         addSubInterceptMethods(classBuilder);
+        addSubMapTransaction(classBuilder);
     }
 
 
@@ -448,6 +449,53 @@ class MethodBuilder extends RemoteBuilder {
                 .addStatement("serviceImpl = null");
 
         classBuilder.addMethod(methodBuilder.build());
+    }
+
+    private void addSubMapTransaction(TypeSpec.Builder classBuilder) {
+
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("mapTransactionCode")
+                .addModifiers(Modifier.PRIVATE)
+                .returns(TypeName.INT)
+                .addParameter(TypeName.INT, "code")
+
+                .beginControlFlow("if (__checkStubProxyMatch == false || code == INTERFACE_TRANSACTION)")
+                .addStatement("return code")
+                .endControlFlow()
+
+                .addStatement("int mappedCode = code")
+
+                .beginControlFlow("if (__lastMethodIndexOfProxy == -1)")
+                .addStatement("__lastMethodIndexOfProxy = code - 1")
+                .endControlFlow()
+
+                .beginControlFlow("if (__lastMethodIndexOfProxy < __lastMethodIndex) ")
+                .beginControlFlow("if (code > __lastMethodIndexOfProxy)")
+                .addStatement("mappedCode = __lastMethodIndex + (code - __lastMethodIndexOfProxy)")
+                .endControlFlow()
+                .endControlFlow()
+
+                .beginControlFlow("else if (__lastMethodIndexOfProxy > __lastMethodIndex)")
+                .beginControlFlow("if (code > __lastMethodIndexOfProxy) ")
+                .addStatement("mappedCode = __lastMethodIndex + (code - __lastMethodIndexOfProxy)")
+                .endControlFlow()
+                .beginControlFlow("else if (code > __lastMethodIndex)")
+                .addStatement("throw new RuntimeException(\"Interface mismatch between Proxy and Stub \" + code + \" [\" + __lastMethodIndex + \"]. Use same interface for both client and server\")")
+                .endControlFlow()
+                .endControlFlow()
+
+                .addStatement("return mappedCode");
+
+        classBuilder.addMethod(methodBuilder.build());
+
+
+        MethodSpec.Builder methodBuilder2 = MethodSpec.methodBuilder("setStubProxyCheck")
+                .addModifiers(Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(TypeName.BOOLEAN, "enable")
+                .addJavadoc("Enable or disable stub proxy mismatch check. Default enabled. Turn it off if using Remoter client with AIDL server")
+                .addStatement("__checkStubProxyMatch = enable");
+
+        classBuilder.addMethod(methodBuilder2.build());
     }
 
 

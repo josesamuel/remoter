@@ -1,7 +1,10 @@
 package util.remoter.remoterservice;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -24,6 +27,14 @@ public class SampleService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.v(TAG, "Service Create");
+
+        //For testing with aidl clients, turn check off
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ISampleService_Stub.setStubProxyCheck(intent.getBooleanExtra("enable", true));
+            }
+        }, new IntentFilter("remoter.test.ProxyStubCheck"));
     }
 
     @Override

@@ -41,6 +41,10 @@ public class AIDLClientToRemoterServerTest {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             sampleService = ISampleService.Stub.asInterface(iBinder);
+            //disable check when using aidl client with remoter stub
+            Intent proxyCheckSignal = new Intent("remoter.test.ProxyStubCheck");
+            proxyCheckSignal.putExtra("enable", false);
+            mActivityRule.getActivity().sendBroadcast( proxyCheckSignal );
             synchronized (objectLock) {
                 objectLock.notify();
             }

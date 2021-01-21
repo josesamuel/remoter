@@ -50,7 +50,7 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 .addParameter("flags", Int::class)
 
         methodBuilder.beginControlFlow("try")
-        methodBuilder.beginControlFlow("when (code)")
+        methodBuilder.beginControlFlow("when (mapTransactionCode(code))")
 
         methodBuilder.beginControlFlow("INTERFACE_TRANSACTION -> ")
         methodBuilder.addStatement("${ParamBuilder.REPLY}?.writeString(DESCRIPTOR)")
@@ -827,6 +827,7 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
     private fun addStubExtras(classBuilder: TypeSpec.Builder) {
         addSubDestroyMethods(classBuilder)
         addSubInterceptMethods(classBuilder)
+        addSubMapTransaction(classBuilder)
     }
 
 
@@ -869,4 +870,40 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
         classBuilder.addFunction(methodBuilder.build())
     }
 
+    private fun addSubMapTransaction(classBuilder: TypeSpec.Builder) {
+        val methodBuilder = FunSpec.builder("mapTransactionCode")
+                .addModifiers(KModifier.PRIVATE)
+                .returns(Int::class)
+                .addParameter("code", Int::class)
+
+                .beginControlFlow("if (checkStubProxyMatch == false || code == INTERFACE_TRANSACTION)")
+                .addStatement("return code")
+                .endControlFlow()
+
+                .addStatement("var mappedCode = code")
+
+                .beginControlFlow("if (__lastMethodIndexOfProxy == -1)")
+                .addStatement("__lastMethodIndexOfProxy = code - 1")
+                .endControlFlow()
+
+                .beginControlFlow("if (__lastMethodIndexOfProxy < __lastMethodIndex) ")
+                .beginControlFlow("if (code > __lastMethodIndexOfProxy)")
+                .addStatement("mappedCode = __lastMethodIndex + (code - __lastMethodIndexOfProxy)")
+                .endControlFlow()
+                .endControlFlow()
+
+                .beginControlFlow("else if (__lastMethodIndexOfProxy > __lastMethodIndex)")
+                .beginControlFlow("if (code > __lastMethodIndexOfProxy) ")
+                .addStatement("mappedCode = __lastMethodIndex + (code - __lastMethodIndexOfProxy)")
+                .endControlFlow()
+                .beginControlFlow("else if (code > __lastMethodIndex)")
+                .addStatement("throw RuntimeException(\"Interface mismatch between Proxy and Stub \" + code + \" [\" + __lastMethodIndex + \"]. Use same interface for both client and server\")")
+                .endControlFlow()
+                .endControlFlow()
+
+                .addStatement("return mappedCode");
+
+
+        classBuilder.addFunction(methodBuilder.build())
+    }
 }

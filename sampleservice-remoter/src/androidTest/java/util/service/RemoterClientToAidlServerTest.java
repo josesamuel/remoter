@@ -25,6 +25,7 @@ import util.remoter.remoterservice.TestActivity;
 import util.remoter.service.FooParcelable;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
+import util.remoter.service.ISampleServiceListener_Stub;
 import util.remoter.service.ISampleService_Proxy;
 
 import static util.remoter.remoterservice.ServiceIntents.INTENT_AIDL_SERVICE;
@@ -369,6 +370,8 @@ public class RemoterClientToAidlServerTest {
                 callBack.add(echo);
             }
         };
+
+        ISampleServiceListener_Stub.setStubProxyCheck(false);
 
         sampleService.testEcho(message, listener);
         Assert.assertEquals(1, callBack.size());

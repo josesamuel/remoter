@@ -149,14 +149,14 @@ Gradle dependency
 ```groovy
 dependencies {
 
-    implementation 'com.josesamuel:remoter-annotations:2.0.1'
-    kapt 'com.josesamuel:remoter:2.0.1'
+    implementation 'com.josesamuel:remoter-annotations:2.0.2'
+    kapt 'com.josesamuel:remoter:2.0.2'
     
     
     //If using kotlin coroutines, include following 
     //to make even the service connection simpler - 
     
-    implementation 'com.josesamuel:remoter-builder:2.0.1'
+    implementation 'com.josesamuel:remoter-builder:2.0.2'
     
 }
 ```

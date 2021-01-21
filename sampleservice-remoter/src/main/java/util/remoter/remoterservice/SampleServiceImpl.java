@@ -16,11 +16,15 @@ import util.remoter.service.FooParcelable;
 import util.remoter.service.IExtE;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleServiceListener;
+import util.remoter.service.IServiceInterfaceWithLesserMethods;
+import util.remoter.service.IServiceInterfaceWithMoreMethods;
 import util.remoter.service.ITest;
 
 public class SampleServiceImpl implements ISampleService {
 
     private static final String TAG = "SampleService";
+    private TestServiceImplWithLesser lesser = new TestServiceImplWithLesser();
+    private TestServiceImplWithMore more = new TestServiceImplWithMore();
 
     private List<ISampleServiceListener> listeners = new CopyOnWriteArrayList<>();
 
@@ -286,5 +290,15 @@ public class SampleServiceImpl implements ISampleService {
     @Override
     public void testOnewayThrowsException(int a){
         throw new RuntimeException("TestOneWay");
+    }
+
+    @Override
+    public IServiceInterfaceWithLesserMethods getTestInterfaceWithLesserServerMethods() {
+        return lesser;
+    }
+
+    @Override
+    public IServiceInterfaceWithMoreMethods getTestInterfaceWithMoreServerMethods() {
+        return more;
     }
 }

@@ -93,6 +93,19 @@ class FieldBuilder extends RemoteBuilder {
             }
         }, null);
 
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "__lastMethodIndex")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
+                .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
+
+        classBuilder.addField(FieldSpec.builder(TypeName.INT, "__lastMethodIndexOfProxy")
+                .addModifiers(Modifier.PRIVATE)
+                .initializer("-1").build());
+
+        classBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "__checkStubProxyMatch")
+                .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+                .initializer("true").build());
+
+
         lastMethodIndex[0] ++;
 
         classBuilder.addField(FieldSpec.builder(TypeName.INT, "TRANSACTION__getStubID")
