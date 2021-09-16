@@ -3,6 +3,7 @@ package remoter.compiler.kbuilder
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.*
@@ -44,6 +45,13 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                     KModifier.PRIVATE)
                     .initializer("%M(%T.IO)", MemberName("kotlinx.coroutines", "CoroutineScope"), Dispatchers::class)
                     .build())
+
+
+            classBuilder.addProperty(PropertySpec.builder("_serviceInitComplete", CompletableDeferred::class.parameterizedBy(Boolean::class),
+                KModifier.PRIVATE)
+                .mutable()
+                .initializer("%M<Boolean>()", MemberName("kotlinx.coroutines", "CompletableDeferred"))
+                .build())
 
         }
 

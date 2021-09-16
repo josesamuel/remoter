@@ -19,4 +19,16 @@ interface IServiceConnector {
      * Disconnect from the service
      */
     fun disconnect()
+
+    /**
+     * Set up a callback to get called when service connects
+     */
+    fun onServiceConnect(callback: ((IBinder) -> Unit)?) {}
+
+    /**
+     * Set up a callback to get called when service disconnects
+     */
+    fun onServiceDisconnect(callback: (() -> Unit)?) {}
+
+
 }

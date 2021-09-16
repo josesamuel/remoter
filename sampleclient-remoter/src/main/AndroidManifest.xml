@@ -12,7 +12,15 @@
 
 
         <activity
-            android:name=".TestActivity">
+            android:name=".TestMemoryLeakActivity">
+            <intent-filter>
+                <action android:name="util.remoter.remoterservice.TestActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".SampleActivityShowingRemoterKotlin">
             <intent-filter>
                 <action android:name="util.remoter.remoterservice.TestActivity" />
                 <category android:name="android.intent.category.DEFAULT" />

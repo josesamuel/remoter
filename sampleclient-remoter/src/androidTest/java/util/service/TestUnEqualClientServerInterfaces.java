@@ -7,12 +7,13 @@ import android.os.IBinder;
 import android.support.test.rule.ActivityTestRule;
 import android.util.Log;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import util.remoter.remoterclient.TestActivity;
+import util.remoter.remoterclient.TestMemoryLeakActivity;
 import util.remoter.service.ISampleService;
 import util.remoter.service.ISampleService_Proxy;
 import util.remoter.service.IServiceInterfaceWithLesserMethods;
@@ -50,7 +51,7 @@ public class TestUnEqualClientServerInterfaces {
 
 
     @Rule
-    public ActivityTestRule<TestActivity> mActivityRule = new ActivityTestRule<TestActivity>(TestActivity.class) {
+    public ActivityTestRule<TestMemoryLeakActivity> mActivityRule = new ActivityTestRule<TestMemoryLeakActivity>(TestMemoryLeakActivity.class) {
         @Override
         protected Intent getActivityIntent() {
             Intent intent = new Intent(INTENT_REMOTER_TEST_ACTIVITY);
@@ -72,6 +73,7 @@ public class TestUnEqualClientServerInterfaces {
         }
     }
 
+    @After
     public void teardown() {
         mActivityRule.getActivity().unbindService(serviceConnection);
     }

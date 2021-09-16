@@ -1,4 +1,5 @@
-include  ':remoter-annotations', ':remoter',  ':sampleservice-aidl', ':sampleservice-remoter', ':sampleclient-remoter' , ':remoter-builder'
+include  ':remoter-annotations', ':remoter',  ':sampleservice-aidl', ':sampleservice-remoter', '' +
+        ':sampleclient-remoter' , ':remoter-builder', ':sample-kotlin-service'
 
 
 rootProject.name = 'remoter-parent'

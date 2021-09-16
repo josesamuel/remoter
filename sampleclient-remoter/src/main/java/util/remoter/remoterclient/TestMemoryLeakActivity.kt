@@ -10,12 +10,14 @@ import android.os.IBinder
 import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import remoter.RemoterProxy
 import remoter.builder.ServiceConnector
 //import remoter.builder.ServiceConnector
 import util.remoter.service.*
+import java.lang.Exception
 
 /**
  * A sample client to validate there are no memory leaks while sending the stub across remote process.
@@ -25,7 +27,7 @@ import util.remoter.service.*
  * Once GC is done on both client and server, the profiler should show only active listeners. Any unregistered
  * listeners should have been collected
  */
-class TestActivity : Activity() {
+class TestMemoryLeakActivity : Activity() {
 
 
     lateinit var service: ISampleKotlinService

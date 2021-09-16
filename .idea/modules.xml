@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/remoter/remoter.iml" filepath="$PROJECT_DIR$/remoter/remoter.iml" group="remoter-parent/remoter" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" filepath="$PROJECT_DIR$/remoter-annotations/remoter-annotations.iml" group="remoter-parent/remoter-annotations" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-builder/remoter-builder.iml" filepath="$PROJECT_DIR$/remoter-builder/remoter-builder.iml" group="remoter-parent/remoter-builder" />
-      <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" group="remoter-parent" />
-      <module fileurl="file://$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" filepath="$PROJECT_DIR$/sampleclient-remoter/sampleclient-remoter.iml" group="remoter-parent/sampleclient-remoter" />
-      <module fileurl="file://$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" filepath="$PROJECT_DIR$/sampleservice-aidl/sampleservice-aidl.iml" group="remoter-parent/sampleservice-aidl" />
-      <module fileurl="file://$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" filepath="$PROJECT_DIR$/sampleservice-remoter/sampleservice-remoter.iml" group="remoter-parent/sampleservice-remoter" />
+      <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.iml" filepath="$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.iml" />
     </modules>
   </component>
 </project>
