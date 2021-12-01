@@ -1,12 +1,16 @@
 package remoter.compiler;
 
 
+import static net.ltgt.gradle.incap.IncrementalAnnotationProcessorType.ISOLATING;
+
 import com.google.auto.service.AutoService;
 
 import net.ltgt.gradle.incap.IncrementalAnnotationProcessor;
 
 import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -15,8 +19,11 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
@@ -24,8 +31,6 @@ import remoter.annotations.Remoter;
 import remoter.compiler.builder.BindingManager;
 import remoter.compiler.kbuilder.CommonKt;
 import remoter.compiler.kbuilder.KBindingManager;
-
-import static net.ltgt.gradle.incap.IncrementalAnnotationProcessorType.ISOLATING;
 
 /**
  * AnnotationProcessor that processes the @{@link Remoter} annotations and
@@ -79,18 +84,69 @@ public class RemoterProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         for (Element element : env.getElementsAnnotatedWith(Remoter.class)) {
             if (element.getKind() == ElementKind.INTERFACE) {
-                if (CommonKt.hasSuspendFunction(element)){
-                    kotlinBindingManager.generateProxy(element);
-                    kotlinBindingManager.generateStub(element);
-                } else {
-                    bindingManager.generateProxy(element);
-                    bindingManager.generateStub(element);
+
+                boolean wrapperFound = false;
+                for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
+                    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> elements : annotationMirror.getElementValues().entrySet()) {
+                        ExecutableElement executableElement = elements.getKey();
+                        AnnotationValue annotationValue = elements.getValue();
+
+                        if (executableElement.getSimpleName().toString().equals("classesToWrap")) {
+                            List classesToConvert = (List) annotationValue.getValue();
+                            if (classesToConvert != null) {
+                                for (Object classToConvert : classesToConvert) {
+                                    String convertName = classToConvert.toString();
+                                    if (convertName.endsWith(".class")) {
+                                        convertName = convertName.substring(0, convertName.length() - 6);
+                                    }
+                                    Element wrappedElement = getElement(convertName);
+                                    if (wrappedElement != null) {
+                                        generateClassesFor(wrappedElement);
+                                    }
+                                    wrapperFound = true;
+                                }
+                            }
+                        }
+                    }
                 }
 
+                if (!wrapperFound) {
+                    generateClassesFor(element);
+                }
             } else {
                 messager.printMessage(Diagnostic.Kind.WARNING, "@Remoter is expected only for interface. Ignoring " + element.getSimpleName());
             }
         }
         return false;
+    }
+
+    /**
+     * Generate the Remoter proxy/stub for given element
+     * @param element
+     */
+    private void generateClassesFor(Element element) {
+        if (element.getKind() == ElementKind.INTERFACE) {
+            if (CommonKt.hasSuspendFunction(element)) {
+                kotlinBindingManager.generateProxy(element);
+                kotlinBindingManager.generateStub(element);
+            } else {
+                bindingManager.generateProxy(element);
+                bindingManager.generateStub(element);
+            }
+        } else {
+            messager.printMessage(Diagnostic.Kind.WARNING, "@Remoter is expected only for interface. Ignoring " + element.getSimpleName());
+        }
+    }
+
+    /**
+     * Returns a [Element] for the given class
+     */
+    private Element getElement(String className) {
+        String cName = className;
+        int templateStart = className.indexOf('<');
+        if (templateStart != -1) {
+            cName = className.substring(0, templateStart).trim();
+        }
+        return processingEnv.getElementUtils().getTypeElement(cName);
     }
 }

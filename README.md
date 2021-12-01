@@ -70,6 +70,19 @@ That's it!
 **Annotations**
 
 * **@Remoter** Annotate on an interface to make it a remote interface
+	* You an also use a marker interface that can provide a list of interfaces for which to generate the Remoter Proxy/Stub classes. For this, annotate @Remoter on the marker interface and specify the list of classes for "**classesToWrap**"
+	
+```java
+  /**
+   * Example of a marker remoter interface that specifies other interfaces that should generate remoter proxy stub
+   * <p>
+   * In this case no proxy/stub gets generate for Marker, but it gets generated for IBaseA and IBaseB
+   */
+	@Remoter(classesToWrap = {IBaseA.class, IBaseB.class})
+	private interface Marker {
+	}
+```
+	
 * **@ParamIn** Mark an array or Parcelable parameter as an **input only** parameter(**in** of aidl). By **default** they are **input and output** (inout of aidl)
 * **@ParamOut** Mark an array or Parcelable parameter as an **output only** parameter(**out** of aidl).
 * **@Oneway** Annotate on a method (in the @Remoter interface) with void return to make it an asynchronous method. 
@@ -149,14 +162,14 @@ Gradle dependency
 ```groovy
 dependencies {
 
-    implementation 'com.josesamuel:remoter-annotations:2.0.3'
-    kapt 'com.josesamuel:remoter:2.0.3'
+    implementation 'com.josesamuel:remoter-annotations:2.0.4'
+    kapt 'com.josesamuel:remoter:2.0.4'
     
     
     //If using kotlin coroutines, include following 
     //to make even the service connection simpler - 
     
-    implementation 'com.josesamuel:remoter-builder:2.0.3'
+    implementation 'com.josesamuel:remoter-builder:2.0.4'
     
 }
 ```

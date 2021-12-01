@@ -1,10 +1,10 @@
 package remoter.annotations;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.CLASS;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Marks an interface as a Remote interface.
@@ -24,4 +24,13 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Retention(CLASS)
 @Target(TYPE)
 public @interface Remoter {
+
+    /**
+     * Specify this only for special case where you want to treat the current interface as just a marker interface that simply provides
+     * a list of actual interfaces that needs to be treated as Remoter interfaces.
+     * <p/>
+     * If specified, this current interface is treated just as marker that wraps this given list
+     * of classes for which Proxy and Stub needs to be generated
+     */
+    Class[] classesToWrap() default {};
 }
