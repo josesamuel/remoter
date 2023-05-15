@@ -30,8 +30,8 @@ dependencies {
 
 
 //After release
-//    api 'com.josesamuel:remoter-annotations:1.0.1'
-//    annotationProcessor 'com.josesamuel:remoter:1.0.1'
+//    api "com.josesamuel:remoter-annotations:$VERSION_NAME"
+//    annotationProcessor "com.josesamuel:remoter:$VERSION_NAME"
 
 //During development
     api project(path: ':remoter-annotations')

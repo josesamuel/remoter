@@ -1,6 +1,7 @@
 package util.remoter.remoterclient
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,6 +20,9 @@ class SampleActivityShowingRemoterKotlin : Activity() {
 
     //Simply create the service with the Proxy and the intent to connect
     private val timeService: ITimeService by lazy { ITimeService_Proxy(this, TIME_SERVICE_INTENT) }
+
+    //optionally specify the flags to bind
+    //private val timeService2: ITimeService by lazy { ITimeService_Proxy(this, TIME_SERVICE_INTENT, Context.BIND_AUTO_CREATE) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

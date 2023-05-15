@@ -12,8 +12,16 @@ import kotlinx.coroutines.sync.withLock
 
 /**
  * Implements [IServiceConnector]
+ *
+ * @param context Context for connecting with service.
+ * @param serviceIntent Explicit intent for the service.
+ * @param flags Optional flags to use while binding with service. Default use [Context.BIND_AUTO_CREATE]
  */
-class ServiceConnector private constructor(private val context: Context, private val serviceIntent: Intent) : IServiceConnector, CoroutineScope by CoroutineScope(Dispatchers.Default) {
+class ServiceConnector private constructor(
+    private val context: Context,
+    private val serviceIntent: Intent,
+    private val flags: Int = Context.BIND_AUTO_CREATE
+) : IServiceConnector, CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
     private val tag = "ServiceConnector${serviceIntent.action}"
     private var serviceBinder: IBinder? = null
@@ -88,7 +96,7 @@ class ServiceConnector private constructor(private val context: Context, private
 
         suspend fun connectWithService(sConnection: ServiceConnection): CompletableDeferred<IBinder> = withContext(Dispatchers.IO) {
             serviceConnectionDeferred = CompletableDeferred()
-            serviceBound = this@ServiceConnector.context.bindService(serviceIntent, sConnection, Context.BIND_AUTO_CREATE)
+            serviceBound = this@ServiceConnector.context.bindService(serviceIntent, sConnection, flags)
             if (!serviceBound) {
                 serviceConnectionDeferred.completeExceptionally(RuntimeException("Service cannot be found $serviceIntent"))
             }
@@ -104,18 +112,20 @@ class ServiceConnector private constructor(private val context: Context, private
          * Returns an [IServiceConnector] for the given explicit [Intent].
          *
          * @param explicitIntent The explicit intent with [Intent.setComponent] set
+         * @param flags Optional flags to use while binding with service. Default use [Context.BIND_AUTO_CREATE]
          */
-        fun of(context: Context, explicitIntent: Intent): IServiceConnector {
+        fun of(context: Context, explicitIntent: Intent, flags: Int = Context.BIND_AUTO_CREATE): IServiceConnector {
             synchronized(serviceConnectors) {
-                return serviceConnectors.getOrPut(explicitIntent.component!!) { ServiceConnector(context, explicitIntent) }
+                return serviceConnectors.getOrPut(explicitIntent.component!!) { ServiceConnector(context, explicitIntent, flags) }
             }
         }
 
         /**
          * Returns an [IServiceConnector] for a service that is registered with the given intent action [intentAction]
+         * @param flags Optional flags to use while binding with service. Default use [Context.BIND_AUTO_CREATE]
          */
-        fun of(context: Context, intentAction: String): IServiceConnector {
-            return of(context, asExplicitIntent(context, Intent(intentAction)))
+        fun of(context: Context, intentAction: String, flags: Int = Context.BIND_AUTO_CREATE): IServiceConnector {
+            return of(context, asExplicitIntent(context, Intent(intentAction)), flags)
         }
 
         /**

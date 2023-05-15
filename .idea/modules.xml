@@ -5,11 +5,30 @@
       <module fileurl="file://$PROJECT_DIR$/remoter-parent.iml" filepath="$PROJECT_DIR$/remoter-parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.main.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.test.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-annotations/remoter-parent.remoter-annotations.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.main.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter-builder/remoter-parent.remoter-builder.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.test.iml" filepath="$PROJECT_DIR$/.idea/modules/remoter/remoter-parent.remoter.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.iml" filepath="$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sample-kotlin-service/remoter-parent.sample-kotlin-service.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleclient-remoter/remoter-parent.sampleclient-remoter.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.main.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-aidl/remoter-parent.sampleservice-aidl.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/sampleservice-remoter/remoter-parent.sampleservice-remoter.unitTest.iml" />
     </modules>
   </component>
 </project>

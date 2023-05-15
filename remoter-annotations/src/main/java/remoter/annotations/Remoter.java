@@ -28,7 +28,7 @@ public @interface Remoter {
     /**
      * Specify this only for special case where you want to treat the current interface as just a marker interface that simply provides
      * a list of actual interfaces that needs to be treated as Remoter interfaces.
-     * <p/>
+     * <p>
      * If specified, this current interface is treated just as marker that wraps this given list
      * of classes for which Proxy and Stub needs to be generated
      */

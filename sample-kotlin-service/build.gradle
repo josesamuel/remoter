@@ -37,9 +37,9 @@ dependencies {
     kapt 'org.parceler:parceler:1.1.12'
 
 //After release
-    //api 'com.josesamuel:remoter-annotations:1.2.8-SNAPSHOT'
-    //implementation 'com.josesamuel:remoter-builder:1.2.8-SNAPSHOT'
-    //kapt 'com.josesamuel:remoter:1.2.8-SNAPSHOT'
+//    api "com.josesamuel:remoter-annotations:$VERSION_NAME"
+//    implementation "com.josesamuel:remoter-builder:$VERSION_NAME"
+//    kapt "com.josesamuel:remoter:$VERSION_NAME"
 
 //During development
     api project(path: ':remoter-annotations')
