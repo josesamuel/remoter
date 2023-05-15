@@ -163,7 +163,7 @@ Gradle dependency
 dependencies {
 
     implementation 'com.josesamuel:remoter-annotations:2.0.5'
-    kapt 'com.josesamuel:remoter:2.0.4-25'
+    kapt 'com.josesamuel:remoter:2.0.5'
     
     
     //If using kotlin coroutines, include following 
