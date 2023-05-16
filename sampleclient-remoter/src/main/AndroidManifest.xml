@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="util.remoter.remoterclient">
+
+    <queries>
+        <intent>
+            <action android:name="util.remoter.service.ITimeService" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -12,18 +19,19 @@
 
 
         <activity
-            android:name=".TestMemoryLeakActivity">
+            android:name=".TestMemoryLeakActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="util.remoter.remoterservice.TestActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".SampleActivityShowingRemoterKotlin">
+            android:name=".SampleActivityShowingRemoterKotlin"
+            android:exported="true">
             <intent-filter>
-                <action android:name="util.remoter.remoterservice.TestActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
