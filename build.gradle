@@ -23,7 +23,7 @@ buildscript {
                             'rules': 'com.android.support.test:rules:0.4.1'
                     ],
             ],
-            javapoet: 'com.squareup:javapoet:1.9.0',
+            javapoet: 'com.squareup:javapoet:1.13.0',
             junit: 'junit:junit:4.12',
             'auto': [
                     'service': 'com.google.auto.service:auto-service:1.0-rc6',

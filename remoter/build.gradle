@@ -22,7 +22,7 @@ dependencies {
   compileOnly("net.ltgt.gradle.incap:incap:0.2")
   annotationProcessor("net.ltgt.gradle.incap:incap-processor:0.2")
 
-  api 'com.squareup:kotlinpoet:1.5.0'
+  api 'com.squareup:kotlinpoet:1.17.0'
 
   compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   compileOnly 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'

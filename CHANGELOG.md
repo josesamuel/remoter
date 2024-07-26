@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 2.0.6 *(2024-07-26)*
+----------------------------
+Fix for generic typed interfaces, updated dependency versions.
+
 
 Version 2.0.5 *(2023-05-15)*
 ----------------------------

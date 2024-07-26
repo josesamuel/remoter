@@ -44,8 +44,8 @@ abstract class RemoteBuilder {
     /**
      * Returns the Interface element
      */
-    Element getRemoterInterfaceElement() {
-        return remoterInterfaceElement;
+    TypeElement getRemoterInterfaceElement() {
+        return (TypeElement)remoterInterfaceElement;
     }
 
     /**

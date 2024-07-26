@@ -8,11 +8,14 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
+import java.util.List;
+
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.TypeMirror;
 
 import remoter.RemoterProxy;
 import remoter.RemoterProxyListener;
@@ -42,7 +45,12 @@ class ClassBuilder extends RemoteBuilder {
 
 
         for (TypeParameterElement typeParameterElement : ((TypeElement) getRemoterInterfaceElement()).getTypeParameters()) {
-            proxyClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+            List<? extends TypeMirror> bounds =  typeParameterElement.getBounds();
+            if (bounds.isEmpty() || getBindingManager().getTypeUtils().isSameType(getBindingManager().getType("java.lang.Object"), bounds.get(0))){
+                proxyClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+            } else {
+                proxyClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString(), TypeName.get(bounds.get(0))));
+            }
         }
 
         proxyClassBuilder.addType(getDeathRecipientWrapper());
@@ -81,7 +89,12 @@ class ClassBuilder extends RemoteBuilder {
                 .superclass(TypeName.get(getBindingManager().getType("android.os.Binder")));
 
         for (TypeParameterElement typeParameterElement : ((TypeElement) getRemoterInterfaceElement()).getTypeParameters()) {
-            stubClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+            List<? extends TypeMirror> bounds =  typeParameterElement.getBounds();
+            if (bounds.isEmpty() || getBindingManager().getTypeUtils().isSameType(getBindingManager().getType("java.lang.Object"), bounds.get(0))){
+                stubClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString()));
+            } else {
+                stubClassBuilder.addTypeVariable(TypeVariableName.get(typeParameterElement.toString(), TypeName.get(bounds.get(0))));
+            }
         }
 
         stubClassBuilder.addType(getBinderWrapper());

@@ -13,7 +13,6 @@ plugins {
 repositories {
     mavenCentral()
     google()
-    jcenter()
 }
 
 apply plugin: 'org.jetbrains.dokka'

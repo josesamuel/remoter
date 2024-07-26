@@ -162,14 +162,14 @@ Gradle dependency
 ```groovy
 dependencies {
 
-    implementation 'com.josesamuel:remoter-annotations:2.0.5'
+    implementation 'com.josesamuel:remoter-annotations:2.0.6'
     kapt 'com.josesamuel:remoter:2.0.5'
     
     
     //If using kotlin coroutines, include following 
     //to make even the service connection simpler - 
     
-    implementation 'com.josesamuel:remoter-builder:2.0.5'
+    implementation 'com.josesamuel:remoter-builder:2.0.6'
     
 }
 ```

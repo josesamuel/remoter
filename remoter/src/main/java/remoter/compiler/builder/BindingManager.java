@@ -64,6 +64,10 @@ public final class BindingManager {
         }
     }
 
+    public Types getTypeUtils() {
+        return typeUtils;
+    }
+
     /**
      * Generates the Proxy for the given @{@link Remoter} interface element
      */
