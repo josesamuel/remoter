@@ -139,7 +139,7 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                 .addModifiers(KModifier.PUBLIC)
                 .addKdoc("Enable or disable stub proxy mismatch check. Default enabled. Turn it off if using Remoter client with AIDL server")
                 .mutable()
-                .initializer("true")
+                .initializer("false")
                 .build())
 
 

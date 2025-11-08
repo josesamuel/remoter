@@ -249,10 +249,12 @@ class MethodBuilder extends RemoteBuilder {
         //catch rethrow
         methodBuilder.beginControlFlow("catch ($T re)", Throwable.class);
         methodBuilder.beginControlFlow("if ((flags & FLAG_ONEWAY) == 0)");
+        methodBuilder.beginControlFlow("if (reply != null)");
         methodBuilder.addStatement("reply.setDataPosition(0)");
         methodBuilder.addStatement("reply.writeInt(REMOTER_EXCEPTION_CODE)");
         methodBuilder.addStatement("reply.writeString(re.getMessage())");
         methodBuilder.addStatement("reply.writeSerializable(re)");
+        methodBuilder.endControlFlow();
         methodBuilder.addStatement("return true");
         methodBuilder.endControlFlow();
         methodBuilder.beginControlFlow("else");
@@ -327,6 +329,7 @@ class MethodBuilder extends RemoteBuilder {
         methodBuilder.addStatement("RemoterGlobalProperties.reset()");
 
         if (!isOneWay) {
+            methodBuilder.beginControlFlow("if (reply != null)");
             methodBuilder.addStatement("reply.writeNoException()");
 
 
@@ -349,6 +352,7 @@ class MethodBuilder extends RemoteBuilder {
                 }
                 pIndex++;
             }
+            methodBuilder.endControlFlow();
         }
 
         methodBuilder.addStatement("return true");

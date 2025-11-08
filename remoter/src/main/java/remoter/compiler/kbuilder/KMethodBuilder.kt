@@ -92,11 +92,13 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
 
 
         methodBuilder.beginControlFlow("catch (re:%T)", Throwable::class)
-        methodBuilder.beginControlFlow("if ( ${ParamBuilder.REPLY} != null && (flags and FLAG_ONEWAY) == 0)")
+        methodBuilder.beginControlFlow("if ( (flags and FLAG_ONEWAY) == 0)")
+        methodBuilder.beginControlFlow("if ( ${ParamBuilder.REPLY} != null )")
         methodBuilder.addStatement("${ParamBuilder.REPLY}.setDataPosition(0)")
         methodBuilder.addStatement("${ParamBuilder.REPLY}.writeInt(REMOTER_EXCEPTION_CODE)")
         methodBuilder.addStatement("${ParamBuilder.REPLY}.writeString(re.message)")
         methodBuilder.addStatement("${ParamBuilder.REPLY}.writeSerializable(re)")
+        methodBuilder.endControlFlow()
         methodBuilder.addStatement("return true")
         methodBuilder.endControlFlow()
         methodBuilder.beginControlFlow("else")

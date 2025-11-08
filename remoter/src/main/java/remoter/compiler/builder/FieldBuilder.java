@@ -103,7 +103,7 @@ class FieldBuilder extends RemoteBuilder {
 
         classBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "__checkStubProxyMatch")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .initializer("true").build());
+                .initializer("false").build());
 
 
         lastMethodIndex[0] ++;
