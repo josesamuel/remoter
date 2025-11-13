@@ -467,9 +467,11 @@ class MethodBuilder extends RemoteBuilder {
                 .endControlFlow()
 
                 .addStatement("int mappedCode = code")
+                .addStatement("int __lastMethodIndexOfProxy = __processLastMethodMap.getOrDefault(Binder.getCallingPid(), -1)")
 
                 .beginControlFlow("if (__lastMethodIndexOfProxy == -1)")
                 .addStatement("__lastMethodIndexOfProxy = code - 1")
+                .addStatement("__processLastMethodMap.put(Binder.getCallingPid(), __lastMethodIndexOfProxy)")
                 .endControlFlow()
 
                 .beginControlFlow("if (__lastMethodIndexOfProxy < __lastMethodIndex) ")

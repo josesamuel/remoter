@@ -902,9 +902,11 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 .endControlFlow()
 
                 .addStatement("var mappedCode = code")
+                .addStatement("var __lastMethodIndexOfProxy = __processLastMethodMap.getOrDefault(Binder.getCallingUid(), -1)")
 
                 .beginControlFlow("if (__lastMethodIndexOfProxy == -1)")
                 .addStatement("__lastMethodIndexOfProxy = code - 1")
+                .addStatement("__processLastMethodMap[Binder.getCallingUid()] = __lastMethodIndexOfProxy")
                 .endControlFlow()
 
                 .beginControlFlow("if (__lastMethodIndexOfProxy < __lastMethodIndex) ")

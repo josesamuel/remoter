@@ -7,6 +7,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -97,13 +98,17 @@ class FieldBuilder extends RemoteBuilder {
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
                 .initializer("android.os.IBinder.FIRST_CALL_TRANSACTION + " + lastMethodIndex[0]).build());
 
-        classBuilder.addField(FieldSpec.builder(TypeName.INT, "__lastMethodIndexOfProxy")
+            classBuilder.addField(FieldSpec.builder(
+                        ParameterizedTypeName.get(ClassName.get(Map.class),
+                                ClassName.get(Integer.class),
+                                ClassName.get(Integer.class)), "__processLastMethodMap")
                 .addModifiers(Modifier.PRIVATE)
-                .initializer("-1").build());
+                .initializer("new $T()", HashMap.class)
+                .build());
 
         classBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "__checkStubProxyMatch")
                 .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                .initializer("false").build());
+                .initializer("true").build());
 
 
         lastMethodIndex[0] ++;

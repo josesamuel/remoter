@@ -112,9 +112,11 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                 .addModifiers(KModifier.PRIVATE).build())
 
 
-        classBuilder.addProperty(PropertySpec.builder("__lastMethodIndexOfProxy", Int::class)
+        classBuilder.addProperty(PropertySpec.builder("__processLastMethodMap", ClassName("kotlin.collections", "MutableMap").parameterizedBy(
+            Int::class.asTypeName(),
+            Int::class.asTypeName()))
                 .addModifiers(KModifier.PRIVATE)
-                .initializer("-1")
+                .initializer("mutableMapOf()")
                 .mutable()
                 .build())
 
@@ -139,7 +141,7 @@ internal class KFieldBuilder(element: Element, bindingManager: KBindingManager) 
                 .addModifiers(KModifier.PUBLIC)
                 .addKdoc("Enable or disable stub proxy mismatch check. Default enabled. Turn it off if using Remoter client with AIDL server")
                 .mutable()
-                .initializer("false")
+                .initializer("true")
                 .build())
 
 
