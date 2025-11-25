@@ -11,6 +11,7 @@ import java.util.Map;
 public class RemoterGlobalProperties {
 
     private static ThreadLocal<Map<String, Object>> globalProperties = new ThreadLocal<>();
+    private static Map<Integer, Integer> proxyUidMap = new HashMap<>();
 
     /**
      * Get value of the given global property if any. Returns null otherwise.
@@ -43,5 +44,19 @@ public class RemoterGlobalProperties {
      */
     public static void reset() {
         globalProperties.remove();
+    }
+
+    public static void mapProxyUid(int from, int to) {
+        proxyUidMap.put(from, to);
+    }
+
+    public static int getMappedUid(int from) {
+        try {
+            if (proxyUidMap.containsKey(from)) {
+                return proxyUidMap.get(from);
+            }
+        } catch (Exception ex) {
+        }
+        return from;
     }
 }
