@@ -166,7 +166,7 @@ dependencies {
     kapt 'com.josesamuel:remoter:2.1.0'
 	
 	//For KSP 
-	//kapt 'com.josesamuel:remoter:2.1.0'
+	//ksp 'com.josesamuel:remoter:2.1.0'
 	
     
     
