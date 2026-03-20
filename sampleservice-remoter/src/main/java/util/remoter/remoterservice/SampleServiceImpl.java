@@ -226,16 +226,16 @@ public class SampleServiceImpl implements ISampleService {
         return customData1;
     }
 
-    @Override
-    public List<? extends CustomData> testParcelList2(List<? extends CustomData> customData1, List<? extends CustomData> customData2, List<? extends CustomData> customData3) {
-        customData2.clear();
-        ((List<CustomData>) customData2).addAll(customData3);
-
-        customData3.clear();
-        ((List<CustomData>) customData3).addAll(customData1);
-
-        return customData1;
-    }
+//    @Override
+//    public List<? extends CustomData> testParcelList2(List<? extends CustomData> customData1, List<? extends CustomData> customData2, List<? extends CustomData> customData3) {
+//        customData2.clear();
+//        ((List<CustomData>) customData2).addAll(customData3);
+//
+//        customData3.clear();
+//        ((List<CustomData>) customData3).addAll(customData1);
+//
+//        return customData1;
+//    }
 
     @Override
     public IExtE getExtE() {

@@ -7,6 +7,9 @@
         <intent>
             <action android:name="util.remoter.service.ITimeService" />
         </intent>
+        <intent>
+            <action android:name="util.remoter.remoterservice.SampleService" />
+        </intent>
     </queries>
 
     <application

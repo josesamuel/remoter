@@ -162,14 +162,18 @@ Gradle dependency
 ```groovy
 dependencies {
 
-    implementation 'com.josesamuel:remoter-annotations:2.0.10'
-    kapt 'com.josesamuel:remoter:2.0.10'
+    implementation 'com.josesamuel:remoter-annotations:2.1.0'
+    kapt 'com.josesamuel:remoter:2.1.0'
+	
+	//For KSP 
+	//kapt 'com.josesamuel:remoter:2.1.0'
+	
     
     
     //If using kotlin coroutines, include following 
     //to make even the service connection simpler - 
     
-    implementation 'com.josesamuel:remoter-builder:2.0.10'
+    implementation 'com.josesamuel:remoter-builder:2.1.0'
     
 }
 ```

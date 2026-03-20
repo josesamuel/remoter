@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+Version 2.1.0 *(2026-03-20)*
+----------------------------
+Added KSP support
+
+
 Version 2.0.9 *(2025-11-14)*
 ----------------------------
 Fix for multi version support from multiple clients.

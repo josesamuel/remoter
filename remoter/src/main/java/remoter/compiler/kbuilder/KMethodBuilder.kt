@@ -562,8 +562,11 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                 .addModifiers(KModifier.PUBLIC)
                 .addModifiers(KModifier.OVERRIDE)
                 .returns(Unit::class)
-                .addStatement("_proxyScope.%M()", MemberName("kotlinx.coroutines", "cancel"))
-                .addStatement("this.remoteBinder = null")
+
+        if (bindingManager.hasRemoterBuilder()) {
+            methodBuilder.addStatement("_proxyScope.%M()", MemberName("kotlinx.coroutines", "cancel"))
+        }
+        methodBuilder.addStatement("this.remoteBinder = null")
                 .addStatement("unRegisterProxyListener(null)")
                 .beginControlFlow("synchronized (stubMap)")
                 .beginControlFlow("stubMap.values.forEach")
@@ -777,9 +780,11 @@ class KMethodBuilder(remoterInterfaceElement: Element, bindingManager: KBindingM
                     .addStatement("return result?: throw %T(\"No remote binder or IServiceConnectot set\")", RuntimeException::class)
         } else {
             methodBuilderNonSuspended.addStatement("val result = remoteBinder")
-                .beginControlFlow("if (waitForInit)")
-                .addStatement("kotlinx.coroutines.runBlocking { _serviceInitComplete.await() }")
-                .endControlFlow()
+            if (bindingManager.hasRemoterBuilder()) {
+                methodBuilderNonSuspended.beginControlFlow("if (waitForInit)")
+                    .addStatement("kotlinx.coroutines.runBlocking { _serviceInitComplete.await() }")
+                    .endControlFlow()
+            }
             methodBuilderNonSuspended.addStatement("return result?: throw %T(\"No remote binder or IServiceConnectot set\")", RuntimeException::class)
         }
 

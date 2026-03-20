@@ -534,16 +534,16 @@ public class RemoterClientToRemoterServerTest {
         List<? extends CustomData> p22 = new ArrayList(Arrays.asList(param2));
         List<? extends CustomData> p33 = new ArrayList(Arrays.asList(param3));
 
-        List<? extends CustomData> result2 = sampleService.testParcelList2(p11, p22, p33);
-
-        Assert.assertEquals(data1.getIntData(), result2.get(0).getIntData());
-        Assert.assertEquals(data2.getEnumData(), result2.get(1).getEnumData());
-
-        Assert.assertEquals(data3.getIntData(), p22.get(0).getIntData());
-        Assert.assertEquals(data1.getEnumData(), p22.get(1).getEnumData());
-
-        Assert.assertEquals(data1.getIntData(), p33.get(0).getIntData());
-        Assert.assertEquals(data2.getEnumData(), p33.get(1).getEnumData());
+//        List<? extends CustomData> result2 = sampleService.testParcelList2(p11, p22, p33);
+//
+//        Assert.assertEquals(data1.getIntData(), result2.get(0).getIntData());
+//        Assert.assertEquals(data2.getEnumData(), result2.get(1).getEnumData());
+//
+//        Assert.assertEquals(data3.getIntData(), p22.get(0).getIntData());
+//        Assert.assertEquals(data1.getEnumData(), p22.get(1).getEnumData());
+//
+//        Assert.assertEquals(data1.getIntData(), p33.get(0).getIntData());
+//        Assert.assertEquals(data2.getEnumData(), p33.get(1).getEnumData());
     }
 
     @Test

@@ -72,7 +72,7 @@ internal class ListParamBuilder(remoterInterfaceElement: Element, bindingManager
                 if (isListOfStrings(param.asType())) {
                     methodBuilder.addStatement("$paramName = $DATA.createStringArrayList()$suffix")
                 } else {
-                    methodBuilder.addStatement("$paramName = $DATA.readArrayList(getClass().getClassLoader())$suffix")
+                    methodBuilder.addStatement("$paramName = $DATA.readArrayList(getClass().getClassLoader())$suffix as %T", param.asType())
                 }
             }
         }
